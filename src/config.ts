@@ -54,12 +54,12 @@ const DiskCheckSchema = z.object({
 		.min(0, "Must be at least 0")
 		.max(100, "Must be at most 100")
 		.default(90),
-	paths: z
-		.array(z.string({ error: 'Must be a filesystem path string (e.g. "/")' }), {
-			error: "Must be an array of filesystem paths",
+	volumes: z
+		.array(z.string({ error: 'Must be a volume name (e.g. "/dev/sda")' }), {
+			error: "Must be an array of volume names",
 		})
-		.min(1, 'Must include at least one path to monitor (e.g. ["/"])')
-		.default(["/"]),
+		.min(1, 'Must include at least one volume name (e.g. ["/dev/sda"])')
+		.default(["/dev/sda"]),
 });
 
 export type DiskChecks = z.infer<typeof DiskCheckSchema>;

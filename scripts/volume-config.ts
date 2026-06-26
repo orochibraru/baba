@@ -12,16 +12,16 @@ const readableVolumes: {
 }[] = [];
 
 console.log("Fetching volume information...");
-const rawFsSize = await si.fsSize();
-for (const rawFs of rawFsSize) {
+const volumes = await si.fsSize();
+for (const vol of volumes) {
 	readableVolumes.push({
-		name: rawFs.fs,
-		usedBytes: humanReadableBytes(rawFs.used),
-		availableBytes: humanReadableBytes(rawFs.available),
-		totalSize: humanReadableBytes(rawFs.size),
-		rawSize: rawFs.size,
-		usePercentage: rawFs.use,
-		mountPoint: rawFs.mount,
+		name: vol.fs,
+		usedBytes: humanReadableBytes(vol.used),
+		availableBytes: humanReadableBytes(vol.available),
+		totalSize: humanReadableBytes(vol.size),
+		rawSize: vol.size,
+		usePercentage: vol.use,
+		mountPoint: vol.mount,
 	});
 }
 

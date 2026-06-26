@@ -1,25 +1,38 @@
-import si from "systeminformation";
+import si, { type Systeminformation } from "systeminformation";
 import { type Checks, config } from "../config";
 import { humanReadableBytes } from "./helpers";
 import { notify } from "./notify";
 
 export class Monitor {
 	readonly checks: Checks;
+	volumes: Systeminformation.FsSizeData[] = [];
 
 	public constructor() {
 		this.checks = config.checks;
+		void this.lazyInit();
+	}
+
+	private async lazyInit() {
+		await this.refreshDisks();
+	}
+
+	public async refreshDisks() {
+		console.log("Refreshing disks...");
+		this.volumes = await si.fsSize();
 	}
 
 	public async runAllParallel() {
-		await Promise.all([
+		const parts = await Promise.all([
 			this.checkCpu(),
 			this.checkLoad(),
 			this.checkMemory(),
 			this.checkDisk(),
 		]);
+
+		console.log(`[${new Date().toISOString()}] ${parts.join(" | ")}`);
 	}
 
-	public async checkCpu() {
+	public async checkCpu(): Promise<string | undefined> {
 		if (!this.checks.cpu.enabled) {
 			return;
 		}
@@ -28,9 +41,10 @@ export class Monitor {
 		if (cpuUsage > this.checks.cpu.usageThresholdPercent) {
 			await notify(`⚠️ **CPU LOAD**: Usage is at **${cpuUsage}%**`);
 		}
+		return `CPU: ${cpuUsage}%`;
 	}
 
-	public async checkLoad() {
+	public async checkLoad(): Promise<string | undefined> {
 		if (!this.checks.load.enabled) {
 			return;
 		}
@@ -41,25 +55,37 @@ export class Monitor {
 				`🚨 **LOAD CRITICAL**: Load average is at **${avgLoad.toFixed(2)}**`,
 			);
 		}
+		return `Load: ${avgLoad.toFixed(2)}`;
 	}
 
-	public async checkDisk() {
+	public async checkDisk(): Promise<string | undefined> {
 		if (!this.checks.disk.enabled) {
 			return;
 		}
-		const rawFsSize = await si.fsSize();
-		for (const rawFs of rawFsSize) {
-			console.log(rawFs);
-			const diskUsage = Math.round((rawFs.used / rawFs.size) * 100);
+		const selectedVolumes = this.volumes.filter((vol) =>
+			this.checks.disk.volumes.includes(vol.mount),
+		);
+
+		if (selectedVolumes.length === 0) {
+			return "No volumes found";
+		}
+
+		let globalUsagePercentage: number = 0;
+
+		for (const vol of selectedVolumes) {
+			const diskUsage = Math.round((vol.used / vol.size) * 100);
+			globalUsagePercentage += diskUsage;
 			if (diskUsage > this.checks.disk.usageThresholdPercent) {
 				await notify(
-					`⚠️ **DISK USAGE**: Usage is at **${diskUsage}% (${humanReadableBytes(rawFs.used)}/${humanReadableBytes(rawFs.size)})**`,
+					`⚠️ **DISK USAGE**: Usage is at **${diskUsage}% (${humanReadableBytes(vol.used)}/${humanReadableBytes(vol.size)})**`,
 				);
 			}
 		}
+
+		return `Disk: ${globalUsagePercentage}%`;
 	}
 
-	public async checkMemory() {
+	public async checkMemory(): Promise<string | undefined> {
 		if (!this.checks.memory.enabled) {
 			return;
 		}
@@ -70,5 +96,6 @@ export class Monitor {
 				`⚠️ **MEMORY USAGE**: Usage is at **${memUsage}% (${humanReadableBytes(rawMem.used)}/${humanReadableBytes(rawMem.total)})**`,
 			);
 		}
+		return `Memory: ${memUsage}%`;
 	}
 }

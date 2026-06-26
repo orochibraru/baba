@@ -2,24 +2,35 @@ import { loadConfig } from "./config";
 import { Monitor } from "./lib/monitor";
 
 const config = await loadConfig();
-console.log("Alerterr started.");
 
 const monitor = new Monitor();
 
 async function startup() {
-	monitor.runAllParallel();
+	console.log("Starting up...");
+	return monitor.runAllParallel();
 }
 
 try {
 	await startup();
+	console.log("Alerterr started.");
 } catch (error) {
 	console.error("Error during startup:", error);
 	process.exit(1);
 }
 
-const interval = setInterval(() => {
+let runCount = 0;
+
+function isOneOfTenRuns() {
+	return runCount % 10 === 0;
+}
+
+const interval = setInterval(async () => {
 	try {
-		monitor.runAllParallel();
+		await monitor.runAllParallel();
+		runCount++;
+		if (isOneOfTenRuns()) {
+			await monitor.refreshDisks();
+		}
 	} catch (error) {
 		console.error("Error monitoring server:", error);
 	}

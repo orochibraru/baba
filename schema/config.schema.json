@@ -1,168 +1,196 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"type": "object",
-	"properties": {
-		"$schema": {
-			"type": "string"
-		},
-		"intervalSeconds": {
-			"default": 60,
-			"type": "number",
-			"exclusiveMinimum": 0
-		},
-		"checks": {
-			"default": {
-				"cpu": {
-					"enabled": true,
-					"usageThresholdPercent": 90,
-					"tempThresholdCelsius": 85
-				},
-				"load": {
-					"enabled": true,
-					"threshold": 8
-				},
-				"memory": {
-					"enabled": true,
-					"usageThresholdPercent": 90
-				},
-				"disk": {
-					"enabled": true,
-					"usageThresholdPercent": 90,
-					"paths": ["/"]
-				}
-			},
-			"type": "object",
-			"properties": {
-				"cpu": {
-					"default": {
-						"enabled": true,
-						"usageThresholdPercent": 90,
-						"tempThresholdCelsius": 85
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"usageThresholdPercent": {
-							"default": 90,
-							"type": "number",
-							"minimum": 0,
-							"maximum": 100
-						},
-						"tempThresholdCelsius": {
-							"default": 85,
-							"type": "number",
-							"exclusiveMinimum": 0
-						}
-					},
-					"required": [
-						"enabled",
-						"usageThresholdPercent",
-						"tempThresholdCelsius"
-					],
-					"additionalProperties": false
-				},
-				"load": {
-					"default": {
-						"enabled": true,
-						"threshold": 8
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"threshold": {
-							"default": 8,
-							"type": "number",
-							"exclusiveMinimum": 0
-						}
-					},
-					"required": ["enabled", "threshold"],
-					"additionalProperties": false
-				},
-				"memory": {
-					"default": {
-						"enabled": true,
-						"usageThresholdPercent": 90
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"usageThresholdPercent": {
-							"default": 90,
-							"type": "number",
-							"minimum": 0,
-							"maximum": 100
-						}
-					},
-					"required": ["enabled", "usageThresholdPercent"],
-					"additionalProperties": false
-				},
-				"disk": {
-					"default": {
-						"enabled": true,
-						"usageThresholdPercent": 90,
-						"paths": ["/"]
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"usageThresholdPercent": {
-							"default": 90,
-							"type": "number",
-							"minimum": 0,
-							"maximum": 100
-						},
-						"paths": {
-							"default": ["/"],
-							"minItems": 1,
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						}
-					},
-					"required": ["enabled", "usageThresholdPercent", "paths"],
-					"additionalProperties": false
-				}
-			},
-			"required": ["cpu", "load", "memory", "disk"],
-			"additionalProperties": false
-		},
-		"notifiers": {
-			"minItems": 1,
-			"type": "array",
-			"items": {
-				"oneOf": [
-					{
-						"type": "object",
-						"properties": {
-							"type": {
-								"type": "string",
-								"const": "discord"
-							},
-							"webhookUrl": {
-								"type": "string",
-								"format": "uri"
-							}
-						},
-						"required": ["type", "webhookUrl"],
-						"additionalProperties": false
-					}
-				]
-			}
-		}
-	},
-	"required": ["intervalSeconds", "checks", "notifiers"],
-	"additionalProperties": false
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "intervalSeconds": {
+      "default": 60,
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "checks": {
+      "default": {
+        "cpu": {
+          "enabled": true,
+          "usageThresholdPercent": 90,
+          "tempThresholdCelsius": 85
+        },
+        "load": {
+          "enabled": true,
+          "threshold": 8
+        },
+        "memory": {
+          "enabled": true,
+          "usageThresholdPercent": 90
+        },
+        "disk": {
+          "enabled": true,
+          "usageThresholdPercent": 90,
+          "volumes": [
+            "/dev/sda"
+          ]
+        }
+      },
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "default": {
+            "enabled": true,
+            "usageThresholdPercent": 90,
+            "tempThresholdCelsius": 85
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "usageThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "tempThresholdCelsius": {
+              "default": 85,
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "enabled",
+            "usageThresholdPercent",
+            "tempThresholdCelsius"
+          ],
+          "additionalProperties": false
+        },
+        "load": {
+          "default": {
+            "enabled": true,
+            "threshold": 8
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "threshold": {
+              "default": 8,
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "enabled",
+            "threshold"
+          ],
+          "additionalProperties": false
+        },
+        "memory": {
+          "default": {
+            "enabled": true,
+            "usageThresholdPercent": 90
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "usageThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "enabled",
+            "usageThresholdPercent"
+          ],
+          "additionalProperties": false
+        },
+        "disk": {
+          "default": {
+            "enabled": true,
+            "usageThresholdPercent": 90,
+            "volumes": [
+              "/dev/sda"
+            ]
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "usageThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "volumes": {
+              "default": [
+                "/dev/sda"
+              ],
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "usageThresholdPercent",
+            "volumes"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "cpu",
+        "load",
+        "memory",
+        "disk"
+      ],
+      "additionalProperties": false
+    },
+    "notifiers": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "discord"
+              },
+              "webhookUrl": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "webhookUrl"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "intervalSeconds",
+    "checks",
+    "notifiers"
+  ],
+  "additionalProperties": false
 }
