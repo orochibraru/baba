@@ -73,6 +73,12 @@ jobs:
       - name: Test (isolated)
         run: bun test --bail --isolate
 
+      - name: Ensure schema is up to date
+        run: |
+          echo "Ensuring schema is up to date..."
+          bun run gen:schema
+          git diff --exit-code
+
   # ===========================================
   # Docker: Build — only when Docker files change
   # ===========================================
