@@ -42,11 +42,9 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build Webapp
-        working-directory: packages/web
         run: bun run build
 
       - name: Type check Webapp
-        working-directory: packages/web
         run: bun run check
 
   ts-lint-test:
