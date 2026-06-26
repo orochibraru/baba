@@ -104,7 +104,7 @@ describe("checkCpu", () => {
 
 describe("checkLoad", () => {
 	test("returns formatted load average string", async () => {
-		cpuLoadData = { currentLoad: 50, avgLoad: 3.141 };
+		cpuLoadData = { currentLoad: 50, avgLoad: Math.PI };
 		const result = await monitor.checkLoad();
 		expect(result).toBe("Load: 3.14");
 	});
