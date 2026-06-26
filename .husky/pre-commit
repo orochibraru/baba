@@ -1,4 +1,5 @@
 bun run gen:schema
+bun run gen:docs
 bun run lint:fix
 
 git add .
