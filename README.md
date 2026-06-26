@@ -22,3 +22,8 @@ Commands:
 ## Installation
 
 WIP
+
+## Configuration
+
+See [config.md](docs/config.md).
+See [env.md](docs/env.md).
