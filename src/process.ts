@@ -32,7 +32,9 @@ export class Process {
 		try {
 			logger.info("Starting up...");
 			await this.monitor.runAllParallel();
-			logger.info("Service is running.");
+			logger.info(
+				`Service is running. Will check every ${this.config.intervalSeconds} seconds.`,
+			);
 		} catch (error) {
 			console.error("Error during startup:", error);
 			process.exit(1);

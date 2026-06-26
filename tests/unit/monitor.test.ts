@@ -5,6 +5,7 @@ import type {
 	IncidentStore,
 	Notification,
 } from "../../src/lib/incident-store";
+import { logger } from "../../src/lib/logger";
 
 // --- Mutable mock state ---
 
@@ -494,28 +495,32 @@ describe("checkGpu", () => {
 describe("runAllParallel", () => {
 	test("logs a combined status line containing all enabled check results", async () => {
 		monitor.volumes = [fakeVolume("/", 50)];
-		const consoleSpy = spyOn(console, "log").mockImplementation(() => {});
+		const loggerSpy = spyOn(logger, "info").mockImplementation(
+			() => logger as never,
+		);
 		await monitor.runAllParallel();
-		const statusLine = consoleSpy.mock.calls
+		const statusLine = loggerSpy.mock.calls
 			.map((args) => String(args[0]))
 			.find((line) => line.includes("CPU:"));
 		expect(statusLine).toBeDefined();
 		expect(statusLine).toContain("Load:");
 		expect(statusLine).toContain("Memory:");
 		expect(statusLine).toContain("Disk:");
-		consoleSpy.mockRestore();
+		loggerSpy.mockRestore();
 	});
 
 	test("omits disabled checks from the status line", async () => {
 		monitor.volumes = [fakeVolume("/", 50)];
-		const consoleSpy = spyOn(console, "log").mockImplementation(() => {});
+		const loggerSpy = spyOn(logger, "info").mockImplementation(
+			() => logger as never,
+		);
 		await monitor.runAllParallel();
-		const statusLine = consoleSpy.mock.calls
+		const statusLine = loggerSpy.mock.calls
 			.map((args) => String(args[0]))
 			.find((line) => line.includes("CPU:"));
 		// Temperature and GPU are disabled in mock config
 		expect(statusLine).not.toContain("Temp:");
 		expect(statusLine).not.toContain("GPU:");
-		consoleSpy.mockRestore();
+		loggerSpy.mockRestore();
 	});
 });

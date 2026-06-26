@@ -1,9 +1,9 @@
 import si, { type Systeminformation } from "systeminformation";
-import { type Checks, config } from "../config";
-import { humanReadableBytes } from "./helpers";
-import type { IncidentStore } from "./incident-store";
-import { logger } from "./logger";
-import { Notifiers } from "./notifiers";
+import { type Checks, config } from "../../config";
+import { humanReadableBytes } from "../helpers";
+import type { IncidentStore } from "../incident-store";
+import { logger } from "../logger";
+import { Notifiers } from "../notifiers";
 
 export class Monitor {
 	readonly checks: Checks;
