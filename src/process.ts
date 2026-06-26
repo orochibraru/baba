@@ -32,7 +32,7 @@ export class Process {
 		try {
 			logger.info("Starting up...");
 			await this.monitor.runAllParallel();
-			logger.info("Alerter started.");
+			logger.info("Service is running.");
 		} catch (error) {
 			console.error("Error during startup:", error);
 			process.exit(1);
@@ -69,7 +69,7 @@ export class Process {
 	}
 
 	public shutdown() {
-		logger.info("Alerter shutting down...");
+		logger.info("Shutting down...");
 		if (this.interval) {
 			clearInterval(this.interval);
 		}

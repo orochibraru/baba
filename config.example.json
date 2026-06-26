@@ -1,18 +1,35 @@
 {
-	"$schema": "./schema/config.schema.json",
+	"$schema": "https://raw.githubusercontent.com/orochibraru/baba/refs/heads/main/schema/config.schema.json",
 	"intervalSeconds": 60,
+	"reminderIntervalMinutes": 30,
+	"database": {
+		"path": "./tmp/baba.db"
+	},
 	"checks": {
+		"temperature": {
+			"enabled": false,
+			"cpuThresholdCelsius": 85,
+			"gpuThresholdCelsius": 85,
+			"consecutiveBreaches": 3
+		},
+		"gpu": {
+			"enabled": false,
+			"vramThresholdPercent": 90,
+			"consecutiveBreaches": 3
+		},
 		"cpu": {
 			"enabled": true,
 			"usageThresholdPercent": 90,
-			"tempThresholdCelsius": 85
+			"consecutiveBreaches": 3
 		},
 		"load": {
 			"enabled": true,
+			"consecutiveBreaches": 3,
 			"threshold": 8.0
 		},
 		"memory": {
 			"enabled": true,
+			"consecutiveBreaches": 3,
 			"usageThresholdPercent": 90
 		},
 		"disk": {

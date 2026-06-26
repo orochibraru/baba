@@ -25,7 +25,7 @@ export class Notifiers {
 	}
 
 	public async alert(message: string) {
-		logger.info(`Sending alert: ${message}`);
+		logger.info(`Alert: ${message}`);
 		for (const notifier of this.notifiers) {
 			await notifier.sendAlert(message);
 		}

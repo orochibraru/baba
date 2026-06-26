@@ -11,6 +11,12 @@ const minimal = {
 
 describe("ConfigSchema", () => {
 	describe("defaults", () => {
+		test("applies default logLevel of info", () => {
+			const r = ConfigSchema.safeParse(minimal);
+			expect(r.success).toBe(true);
+			if (r.success) expect(r.data.logLevel).toBe("info");
+		});
+
 		test("applies default intervalSeconds of 60", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
@@ -96,6 +102,20 @@ describe("ConfigSchema", () => {
 			const r = ConfigSchema.safeParse({ ...minimal, intervalSeconds: 30 });
 			expect(r.success).toBe(true);
 			if (r.success) expect(r.data.intervalSeconds).toBe(30);
+		});
+
+		test("accepts valid logLevel values", () => {
+			for (const level of [
+				"trace",
+				"debug",
+				"info",
+				"warn",
+				"error",
+			] as const) {
+				const r = ConfigSchema.safeParse({ ...minimal, logLevel: level });
+				expect(r.success).toBe(true);
+				if (r.success) expect(r.data.logLevel).toBe(level);
+			}
 		});
 
 		test("accepts $schema field without failing", () => {
@@ -280,6 +300,15 @@ describe("ConfigSchema", () => {
 		test("rejects missing notifiers", () => {
 			const r = ConfigSchema.safeParse({});
 			expect(r.success).toBe(false);
+		});
+
+		test("rejects an invalid logLevel", () => {
+			const r = ConfigSchema.safeParse({ ...minimal, logLevel: "verbose" });
+			expect(r.success).toBe(false);
+			if (!r.success)
+				expect(r.error.issues[0]?.message).toContain(
+					'Must be one of: "trace", "debug"',
+				);
 		});
 
 		test("rejects zero intervalSeconds", () => {

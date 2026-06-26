@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { logger } from "./lib/logger";
+import { logger, setLogLevel } from "./lib/logger";
 import { discordNotifierSchema } from "./lib/notifiers/discord";
 import { telegramNotifierSchema } from "./lib/notifiers/telegram";
 
@@ -123,6 +123,11 @@ const DatabaseSchema = z.object({
 
 export const ConfigSchema = z.object({
 	$schema: z.string().optional(),
+	logLevel: z
+		.enum(["trace", "debug", "info", "warn", "error"], {
+			error: 'Must be one of: "trace", "debug", "info", "warn", "error"',
+		})
+		.default("info"),
 	intervalSeconds: z
 		.number({ error: "Must be a number" })
 		.positive("Must be a positive number of seconds between checks (e.g. 60)")
@@ -145,14 +150,14 @@ export type Config = z.infer<typeof ConfigSchema>;
 export let config: Config;
 
 export async function loadConfig(path = "./config.json"): Promise<Config> {
-	logger.info(`Loading config from ${path}...`);
+	logger.debug(`Loading config from ${path}...`);
 	const file = Bun.file(path);
 	if (!(await file.exists())) {
 		throw new Error(
 			`Config file not found at "${path}". Copy config.example.json to config.json and fill it in.`,
 		);
 	}
-	logger.info("Parsing config...");
+	logger.debug("Parsing config...");
 	const raw = JSON.parse(await file.text()) as unknown;
 	const result = ConfigSchema.safeParse(raw);
 	if (!result.success) {
@@ -161,7 +166,8 @@ export async function loadConfig(path = "./config.json"): Promise<Config> {
 			.join("\n");
 		throw new Error(`Invalid config:\n${issues}`);
 	}
-	logger.info("Config parsed successfully.");
 	config = result.data;
+	setLogLevel(config.logLevel);
+	logger.debug("Config parsed successfully.");
 	return config;
 }

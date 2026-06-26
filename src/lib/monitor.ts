@@ -26,8 +26,11 @@ export class Monitor {
 	}
 
 	public async refreshDisks() {
-		logger.info("Refreshing disks...");
+		logger.debug("Refreshing disk list...");
 		this.volumes = await si.fsSize();
+		logger.debug(
+			`Found ${this.volumes.length} volume(s): ${this.volumes.map((v) => v.fs).join(", ")}`,
+		);
 	}
 
 	private incrementBreach(key: string): number {
@@ -63,7 +66,11 @@ export class Monitor {
 				);
 				const elapsed =
 					Date.now() - (lastNotif?.sent_at ?? activeIncident.started_at);
+				logger.debug(
+					`[${key}] breach ongoing (incident #${activeIncident.id}), elapsed ${Math.round(elapsed / 1000)}s`,
+				);
 				if (elapsed > this.reminderIntervalMs) {
+					logger.debug(`[${key}] reminder interval exceeded, re-alerting`);
 					await this.notifiers.alert(reminderMsg);
 					this.incidentStore.recordNotification(
 						activeIncident.id,
@@ -73,7 +80,11 @@ export class Monitor {
 				}
 			} else {
 				const count = this.incrementBreach(key);
+				logger.debug(
+					`[${key}] breach ${count}/${consecutiveRequired} (value: ${value}, threshold: ${threshold})`,
+				);
 				if (count >= consecutiveRequired) {
+					logger.debug(`[${key}] opening incident`);
 					const incident = this.incidentStore.openIncident(
 						metric,
 						volume,
@@ -88,6 +99,9 @@ export class Monitor {
 		} else {
 			this.resetBreach(key);
 			if (activeIncident) {
+				logger.debug(
+					`[${key}] value normalised, resolving incident #${activeIncident.id}`,
+				);
 				this.incidentStore.resolveIncident(activeIncident.id);
 				await this.notifiers.alert(recoveryMsg);
 				this.incidentStore.recordNotification(
@@ -95,6 +109,8 @@ export class Monitor {
 					"recovery",
 					true,
 				);
+			} else {
+				logger.debug(`[${key}] value normal (${value} ≤ ${threshold})`);
 			}
 		}
 	}
@@ -118,6 +134,7 @@ export class Monitor {
 		if (!this.checks.cpu.enabled) return;
 		const cpuLoad = await si.currentLoad();
 		const usage = Math.round(cpuLoad.currentLoad);
+		logger.debug(`CPU usage: ${usage}%`);
 		await this.handleBreach(
 			"cpu",
 			null,
@@ -135,6 +152,7 @@ export class Monitor {
 		if (!this.checks.load.enabled) return;
 		const cpuLoad = await si.currentLoad();
 		const avgLoad = cpuLoad.avgLoad;
+		logger.debug(`Load average: ${avgLoad.toFixed(2)}`);
 		await this.handleBreach(
 			"load",
 			null,
@@ -152,6 +170,9 @@ export class Monitor {
 		if (!this.checks.memory.enabled) return;
 		const rawMem = await si.mem();
 		const memUsage = Math.round((rawMem.used / rawMem.total) * 100);
+		logger.debug(
+			`Memory: ${memUsage}% (${humanReadableBytes(rawMem.used)} / ${humanReadableBytes(rawMem.total)})`,
+		);
 		await this.handleBreach(
 			"memory",
 			null,
@@ -175,6 +196,9 @@ export class Monitor {
 		let totalUsage = 0;
 		for (const vol of selectedVolumes) {
 			const diskUsage = Math.round((vol.used / vol.size) * 100);
+			logger.debug(
+				`Disk ${vol.fs}: ${diskUsage}% (${humanReadableBytes(vol.used)} / ${humanReadableBytes(vol.size)})`,
+			);
 			totalUsage += diskUsage;
 			await this.handleBreach(
 				"disk",
@@ -201,6 +225,7 @@ export class Monitor {
 
 		const cpuMax = cpuTemp.max ?? cpuTemp.main;
 		if (cpuMax != null) {
+			logger.debug(`CPU temp: ${cpuMax}°C`);
 			await this.handleBreach(
 				"temp:cpu",
 				null,
@@ -217,6 +242,7 @@ export class Monitor {
 		for (const controller of graphics.controllers) {
 			const gpuTemp = controller.temperatureGpu;
 			if (gpuTemp != null && gpuTemp > 0) {
+				logger.debug(`GPU temp (${controller.name}): ${gpuTemp}°C`);
 				await this.handleBreach(
 					`temp:gpu:${controller.name}`,
 					null,
@@ -243,6 +269,7 @@ export class Monitor {
 		for (const controller of graphics.controllers) {
 			const util = controller.utilizationGpu;
 			if (util == null) continue;
+			logger.debug(`GPU utilization (${controller.name}): ${util}%`);
 			await this.handleBreach(
 				`gpu:${controller.name}`,
 				null,

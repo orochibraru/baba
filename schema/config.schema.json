@@ -5,6 +5,11 @@
 		"$schema": {
 			"type": "string"
 		},
+		"logLevel": {
+			"default": "info",
+			"type": "string",
+			"enum": ["trace", "debug", "info", "warn", "error"]
+		},
 		"intervalSeconds": {
 			"default": 60,
 			"type": "number",
@@ -305,6 +310,7 @@
 		}
 	},
 	"required": [
+		"logLevel",
 		"intervalSeconds",
 		"reminderIntervalMinutes",
 		"database",

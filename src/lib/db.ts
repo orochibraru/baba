@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { mkdirSync } from "fs";
+import { mkdirSync } from "node:fs";
 
 let db: Database | undefined;
 

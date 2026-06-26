@@ -3,13 +3,13 @@ import { LogLayer } from "loglayer";
 import pino from "pino";
 
 const pinoLogger = pino({
-	level: "trace", // On laisse tout passer, LogLayer filtrera si besoin
+	level: "info",
 	transport: {
 		target: "pino-pretty",
 		options: {
 			colorize: true,
-			translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l", // Format lisible de humain
-			ignore: "pid,hostname", // On vire le bruit inutile en local
+			translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l",
+			ignore: "pid,hostname",
 		},
 	},
 });
@@ -19,3 +19,7 @@ export const logger = new LogLayer({
 		logger: pinoLogger,
 	}),
 });
+
+export function setLogLevel(level: string): void {
+	pinoLogger.level = level;
+}
