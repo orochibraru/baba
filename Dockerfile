@@ -7,7 +7,7 @@ RUN bun install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
-RUN bun build --compile --outfile /app/alerterr ./src/index.ts
+RUN bun build --compile --outfile /app/baba ./src/index.ts
 
 FROM alpine:latest
 
@@ -15,6 +15,6 @@ RUN apk add --no-cache libstdc++ libgcc
 
 WORKDIR /app
 
-COPY --from=build /app/alerterr /app/alerterr
+COPY --from=build /app/baba /app/baba
 
-CMD ["/app/alerterr", "start"]
+CMD ["/app/baba", "start"]

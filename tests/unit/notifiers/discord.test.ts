@@ -25,7 +25,7 @@ describe("sendDiscordAlert", () => {
 		expect(init.method).toBe("POST");
 		const body = JSON.parse(init.body as string);
 		expect(body.content).toBe("Server is on fire");
-		expect(body.username).toBe("Alerterr");
+		expect(body.username).toBe("Baba");
 	});
 
 	test("sets Content-Type header to application/json", async () => {

@@ -1,7 +1,7 @@
-# Alerterr
+# Baba
 
 ```bash
-Usage: Alerterr [options] [command]
+Usage: ./baba [options] [command]
 
 Monitor your homelab server and alert on issues.
 

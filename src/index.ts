@@ -6,7 +6,7 @@ import { validate } from "../scripts/validate";
 import { Process } from "./process";
 
 program
-	.name("Alerterr")
+	.name("Baba")
 	.description("Monitor your homelab server and alert on issues.")
 	.version(packagejson.version);
 

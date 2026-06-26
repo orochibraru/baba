@@ -16,7 +16,7 @@ concurrency:
 
 env:
   TZ: Europe/Paris
-  REGISTRY_IMAGE: orochibraru/alerterr
+  REGISTRY_IMAGE: orochibraru/baba
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   CI: true
 
@@ -81,7 +81,7 @@ jobs:
     uses: ./.github/workflows/docker.yaml
     with:
       publish: true
-      image-name: orochibraru/alerterr
+      image-name: orochibraru/baba
     secrets:
       docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}
 

@@ -29,7 +29,7 @@ export class DiscordNotifier extends AbstractNotifier {
 			const res = await fetch(this.webhookUrl, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ content: message, username: "Alerterr" }),
+				body: JSON.stringify({ content: message, username: "Baba" }),
 			});
 			if (!res.ok) {
 				console.error(
