@@ -6,6 +6,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "bun run --hot ./src/index.ts start",
+		"build": "bun build.ts",
 		"lint": "biome check .",
 		"lint:fix": "biome check --fix .",
 		"gen:schema": "bun run scripts/generate-schema.ts",

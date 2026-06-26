@@ -48,12 +48,12 @@ import { Monitor } from "../../src/lib/monitor";
 const GB = 1024 ** 3;
 
 function fakeVolume(
-	mount: string,
+	fs: string,
 	usedPercent: number,
 ): Systeminformation.FsSizeData {
 	const size = 100 * GB;
 	const used = (usedPercent / 100) * size;
-	return { mount, used, size } as unknown as Systeminformation.FsSizeData;
+	return { fs, used, size } as unknown as Systeminformation.FsSizeData;
 }
 
 // --- Setup ---
@@ -160,7 +160,7 @@ describe("checkDisk", () => {
 	});
 
 	test("returns 'No volumes found' when no volumes match config paths", async () => {
-		monitor.volumes = [fakeVolume("/data", 50)]; // mount not in config volumes ["/"]
+		monitor.volumes = [fakeVolume("/dev/sdb", 50)]; // fs not in config volumes ["/"]
 		const result = await monitor.checkDisk();
 		expect(result).toBe("No volumes found");
 	});
@@ -179,8 +179,8 @@ describe("checkDisk", () => {
 	});
 
 	test("aggregates usage across multiple matched volumes", async () => {
-		// Only "/" is in config volumes; "/boot" is not and should be ignored
-		monitor.volumes = [fakeVolume("/", 40), fakeVolume("/boot", 80)];
+		// Only "/" is in config volumes; "/dev/sdb" is not and should be ignored
+		monitor.volumes = [fakeVolume("/", 40), fakeVolume("/dev/sdb", 80)];
 		const result = await monitor.checkDisk();
 		expect(result).toBe("Disk: 40%");
 		expect(notifySpy).not.toHaveBeenCalled();

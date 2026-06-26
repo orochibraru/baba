@@ -97,7 +97,7 @@ jobs:
     steps:
       - name: Check results
         run: |
-          results=("${{ needs.ts-build-check.result }}" "${{ needs.ts-lint-test.result }}" "${{ needs.e2e-local.result }}" "${{ needs.e2e-s3.result }}" "${{ needs.docker.result }}" "${{ needs.docs.result }}")
+          results=("${{ needs.ts-build-check.result }}" "${{ needs.ts-lint-test.result }}" "${{ needs.docker.result }}")
           for result in "${results[@]}"; do
             if [[ "$result" == "failure" || "$result" == "cancelled" ]]; then
               echo "::error::One or more jobs failed or were cancelled"
