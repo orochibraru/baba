@@ -7,7 +7,7 @@ on:
         default: false
       image-name:
         type: string
-        default: orochibraru/penombre
+        default: orochibraru/watcherr
     secrets:
       docker_hub_token:
         required: false

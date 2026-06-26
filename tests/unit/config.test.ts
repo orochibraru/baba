@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { ConfigSchema } from "../../src/config";
 
-const VALID_WEBHOOK = "https://discord.com/api/webhooks/123456789/abcdefghijklmno";
+const VALID_WEBHOOK =
+	"https://discord.com/api/webhooks/123456789/abcdefghijklmno";
 
 const minimal = {
 	notifiers: [{ type: "discord", webhookUrl: VALID_WEBHOOK }],
@@ -188,7 +189,9 @@ describe("ConfigSchema", () => {
 			});
 			expect(r.success).toBe(false);
 			if (!r.success) {
-				expect(r.error.issues[0]?.message).toContain("Must include at least one");
+				expect(r.error.issues[0]?.message).toContain(
+					"Must include at least one",
+				);
 			}
 		});
 
