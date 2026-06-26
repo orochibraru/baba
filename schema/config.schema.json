@@ -28,7 +28,7 @@
 				"disk": {
 					"enabled": true,
 					"usageThresholdPercent": 90,
-					"volumes": ["/dev/sda"]
+					"volumes": ["/"]
 				}
 			},
 			"type": "object",
@@ -109,7 +109,7 @@
 					"default": {
 						"enabled": true,
 						"usageThresholdPercent": 90,
-						"volumes": ["/dev/sda"]
+						"volumes": ["/"]
 					},
 					"type": "object",
 					"properties": {
@@ -124,7 +124,7 @@
 							"maximum": 100
 						},
 						"volumes": {
-							"default": ["/dev/sda"],
+							"default": ["/"],
 							"minItems": 1,
 							"type": "array",
 							"items": {

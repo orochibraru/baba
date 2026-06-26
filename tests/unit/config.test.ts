@@ -199,7 +199,9 @@ describe("ConfigSchema", () => {
 				});
 				expect(r.success).toBe(false);
 				if (!r.success)
-					expect(r.error.issues[0]?.message).toContain("Chat ID cannot be empty");
+					expect(r.error.issues[0]?.message).toContain(
+						"Chat ID cannot be empty",
+					);
 			});
 
 			test("rejects extra unknown fields", () => {
