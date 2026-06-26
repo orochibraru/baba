@@ -2,6 +2,8 @@
 	"$schema": "https://raw.githubusercontent.com/orochibraru/baba/refs/heads/main/schema/config.schema.json",
 	"intervalSeconds": 60,
 	"reminderIntervalMinutes": 30,
+	"machineName": "My Server",
+	"logLevel": "info",
 	"database": {
 		"path": "./tmp/baba.db"
 	},
