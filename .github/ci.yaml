@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_call:
+    secrets:
+      docker_hub_token:
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-ci
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  TZ: Europe/Paris
+  REGISTRY_IMAGE: orochibraru/penombre
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  CI: true
+
+jobs:
+  # ===========================================
+  # TypeScript: Lint, Format, Build — always runs
+  # ===========================================
+  ts-build-check:
+    name: TypeScript Build & Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js for tooling
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Webapp
+        working-directory: packages/web
+        run: bun run build
+
+      - name: Type check Webapp
+        working-directory: packages/web
+        run: bun run check
+
+  ts-lint-test:
+    name: TypeScript Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Node.js for tooling
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Linting
+        run: bun run lint
+
+      - name: Format check
+        run: bun run format:check
+
+      - name: Test
+        run: bun test --bail
+
+      - name: Test (isolated)
+        run: bun test --bail --isolate
+
+  # ===========================================
+  # Docker: Build — only when Docker files change
+  # ===========================================
+  docker:
+    name: Docker
+    uses: ./.github/workflows/docker.yaml
+    with:
+      publish: true
+      image-name: orochibraru/penombre
+    secrets:
+      docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+  # ===========================================
+  # Gate — always runs; set this as the single
+  # required status check in branch protection
+  # ===========================================
+  gate:
+    name: CI Gate
+    if: always()
+    needs: [ts-build-check, ts-lint-test, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          results=("${{ needs.ts-build-check.result }}" "${{ needs.ts-lint-test.result }}" "${{ needs.e2e-local.result }}" "${{ needs.e2e-s3.result }}" "${{ needs.docker.result }}" "${{ needs.docs.result }}")
+          for result in "${results[@]}"; do
+            if [[ "$result" == "failure" || "$result" == "cancelled" ]]; then
+              echo "::error::One or more jobs failed or were cancelled"
+              exit 1
+            fi
+          done
+          echo "All checks passed (skipped jobs are OK)"

@@ -9,7 +9,8 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --fix .",
 		"gen:schema": "bun run scripts/generate-schema.ts",
-		"prepare": "husky"
+		"prepare": "husky",
+		"check": "tsc --noEmit --project tsconfig.json"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.1",
