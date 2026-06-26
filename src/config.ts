@@ -5,11 +5,10 @@ import { discordNotifierSchema } from "./lib/notifiers/discord";
 //   1. Create src/lib/notifiers/<name>.ts — export its Zod schema and class
 //   2. Import the schema here and add it to the array below
 //   3. Add an instantiation branch in src/lib/notify.ts
-const NotifierSchema = z.discriminatedUnion(
-	"type",
-	[discordNotifierSchema],
-	{ error: (issue) => `Unknown notifier type "${(issue.input as Record<string, unknown>)?.["type"]}". Registered types: discord` },
-);
+const NotifierSchema = z.discriminatedUnion("type", [discordNotifierSchema], {
+	error: (issue) =>
+		`Unknown notifier type "${(issue.input as Record<string, unknown>)?.type}". Registered types: discord`,
+});
 
 const CpuCheckSchema = z.object({
 	enabled: z.boolean({ error: "Must be true or false" }).default(true),
