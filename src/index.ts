@@ -2,6 +2,7 @@ import { sleep } from "bun";
 import { program } from "commander";
 import packagejson from "../package.json";
 import { setup } from "../scripts/setup";
+import { validate } from "../scripts/validate";
 import { Process } from "./process";
 
 program
@@ -23,6 +24,13 @@ program
 	.description("Start the monitoring process.")
 	.action(async () => {
 		await setup();
+	});
+
+program
+	.command("validate")
+	.description("Validate the webhooks by sending a test alert.")
+	.action(async () => {
+		await validate();
 	});
 
 program.parse(process.argv);
