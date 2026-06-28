@@ -64,12 +64,11 @@ async function main() {
 			}
 		}
 	} catch (e) {
-		console.error("Failed to build package.", e);
-		errors.push(`Failed to build package: ${e}`);
+		errors.push(`Failed to build package: ${JSON.stringify(e)}`);
 	}
 
 	if (errors.length > 0) {
-		console.error("Build errors:", errors);
+		logger.error(`Build errors: ${JSON.stringify(errors)}`);
 	}
 }
 

@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { ConfigSchema } from "../src/config";
 import { ENV_VARS } from "../src/lib/env";
+import { logger } from "../src/lib/logger";
+
+logger.info("Generating docs...");
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -102,6 +105,12 @@ const jsonSchema = z.toJSONSchema(ConfigSchema, {
 	unrepresentable: "any",
 }) as JsonSchema;
 
+// machineName defaults to os.hostname() at runtime — strip the machine-specific
+// value so generated docs don't change on every developer's machine.
+if (jsonSchema.properties?.machineName) {
+	delete jsonSchema.properties.machineName.default;
+}
+
 const configRows = jsonSchema.properties
 	? flattenProperties(jsonSchema.properties)
 	: [];
@@ -136,4 +145,4 @@ See \`config.example.json\` in the repository root.
 
 await Bun.write("docs/env.md", envMd);
 await Bun.write("docs/config.md", configMd);
-console.log("Generated docs/env.md and docs/config.md");
+logger.info("Generated docs/env.md and docs/config.md");

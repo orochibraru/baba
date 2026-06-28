@@ -74,7 +74,9 @@ export class TemperatureCheck extends BaseCheck {
 			valid(cpuTemp.max) ??
 			valid(cpuTemp.main) ??
 			(cpuTemp.cores.length > 0 ? valid(Math.max(...cpuTemp.cores)) : null) ??
-			(cpuTemp.socket.length > 0 ? valid(Math.max(...cpuTemp.socket)) : null) ??
+			(cpuTemp.socket != null && cpuTemp.socket.length > 0
+				? valid(Math.max(...cpuTemp.socket))
+				: null) ??
 			valid(cpuTemp.chipset)
 		);
 	}

@@ -9,6 +9,6 @@ export async function validate() {
 		await notifiers.alert("This is a test alert.");
 		logger.info("Test alert sent successfully.");
 	} catch (error) {
-		console.error("Failed to send test alert:", error);
+		logger.error(`Failed to send test alert: ${JSON.stringify(error)}`);
 	}
 }

@@ -14,7 +14,13 @@ import { logger } from "../../src/lib/logger";
 let cpuLoadData = { currentLoad: 50, avgLoad: 2.5 };
 let memData = { total: 16 * 1024 ** 3, used: 8 * 1024 ** 3 };
 let diskData: Systeminformation.FsSizeData[] = [];
-let cpuTempData = { main: null as number | null, max: null as number | null };
+let cpuTempData = {
+	main: null as number | null,
+	max: null as number | null,
+	cores: [] as number[],
+	socket: [] as number[],
+	chipset: null as number | null,
+};
 let graphicsData = {
 	controllers: [] as Partial<Systeminformation.GraphicsControllerData>[],
 };
@@ -135,7 +141,7 @@ beforeEach(async () => {
 	cpuLoadData = { currentLoad: 50, avgLoad: 2.5 };
 	memData = { total: 16 * GB, used: 8 * GB };
 	diskData = [];
-	cpuTempData = { main: null, max: null };
+	cpuTempData = { main: null, max: null, cores: [], socket: [], chipset: null };
 	graphicsData = { controllers: [] };
 
 	for (const spy of Object.values(incidentStoreMock)) {
@@ -457,7 +463,13 @@ describe("checkTemperature", () => {
 	});
 
 	test("returns 'Temp: N/A' when enabled but no readings available", async () => {
-		cpuTempData = { main: null, max: null };
+		cpuTempData = {
+			main: null,
+			max: null,
+			cores: [],
+			socket: [],
+			chipset: null,
+		};
 		graphicsData = { controllers: [] };
 		const check = new TemperatureCheck(
 			{
@@ -472,7 +484,7 @@ describe("checkTemperature", () => {
 	});
 
 	test("returns CPU temp string when reading is available", async () => {
-		cpuTempData = { main: 72, max: 75 };
+		cpuTempData = { main: 72, max: 75, cores: [], socket: [], chipset: null };
 		const check = new TemperatureCheck(
 			{
 				enabled: true,
@@ -486,7 +498,7 @@ describe("checkTemperature", () => {
 	});
 
 	test("opens incident when CPU temp exceeds threshold", async () => {
-		cpuTempData = { main: 75, max: 78 };
+		cpuTempData = { main: 75, max: 78, cores: [], socket: [], chipset: null };
 		const check = new TemperatureCheck(
 			{
 				enabled: true,
@@ -507,7 +519,13 @@ describe("checkTemperature", () => {
 	});
 
 	test("opens incident when GPU temp exceeds threshold", async () => {
-		cpuTempData = { main: null, max: null };
+		cpuTempData = {
+			main: null,
+			max: null,
+			cores: [],
+			socket: [],
+			chipset: null,
+		};
 		graphicsData = { controllers: [{ name: "RTX4090", temperatureGpu: 80 }] };
 		const check = new TemperatureCheck(
 			{

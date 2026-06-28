@@ -17,6 +17,9 @@
 		"enabled": true,
 		"rules": {
 			"preset": "recommended",
+			"suspicious": {
+				"noConsole": "error"
+			},
 			"complexity": {
 				"useMaxParams": {
 					"level": "error",

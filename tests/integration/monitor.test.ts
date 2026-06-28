@@ -6,6 +6,13 @@
 // --- Mutable system metric state ---
 
 let siCpuLoad = 50;
+let siCpuTemp: {
+	main: number | null;
+	max: number | null;
+	cores: number[];
+	socket: number[];
+	chipset: number | null;
+} = { main: null, max: null, cores: [], socket: [], chipset: null };
 
 // biome-ignore lint/suspicious/noExplicitAny: integration config mock
 const integConfig: any = {
@@ -38,13 +45,14 @@ mock.module("systeminformation", () => ({
 		currentLoad: async () => ({ currentLoad: siCpuLoad, avgLoad: 1.0 }),
 		mem: async () => ({ total: 16 * 1024 ** 3, used: 8 * 1024 ** 3 }),
 		fsSize: async () => [],
-		cpuTemperature: async () => ({ main: null, max: null }),
+		cpuTemperature: async () => siCpuTemp,
 		graphics: async () => ({ controllers: [] }),
 	},
 }));
 
 import {
 	afterAll,
+	afterEach,
 	beforeAll,
 	beforeEach,
 	describe,
@@ -82,10 +90,7 @@ beforeAll(() => {
 
 	// Redirect Telegram API calls to our test server
 	const realFetch = globalThis.fetch;
-	globalThis.fetch = async (
-		input: RequestInfo | URL,
-		init?: RequestInit,
-	): Promise<Response> => {
+	globalThis.fetch = (async (input, init) => {
 		const url = String(input);
 		if (url.includes("api.telegram.org")) {
 			return realFetch(
@@ -93,8 +98,8 @@ beforeAll(() => {
 				init,
 			);
 		}
-		return realFetch(input, init);
-	};
+		return realFetch(input as Parameters<typeof fetch>[0], init);
+	}) as typeof fetch;
 });
 
 afterAll(() => {
@@ -104,8 +109,10 @@ afterAll(() => {
 beforeEach(() => {
 	httpLog.length = 0;
 	siCpuLoad = 50;
+	siCpuTemp = { main: null, max: null, cores: [], socket: [], chipset: null };
 	integConfig.checks.cpu.consecutiveBreaches = 1;
 	integConfig.checks.cpu.usageThresholdPercent = 80;
+	integConfig.checks.temperature.enabled = false;
 	integConfig.notifiers = [];
 });
 
@@ -295,5 +302,114 @@ describe("multiple notifiers", () => {
 		const paths = httpLog.map((r) => r.path);
 		expect(paths).toContain("/discord");
 		expect(paths).toContain(`/bot${BOT_TOKEN}/sendMessage`);
+	});
+});
+
+// --- Temperature ---
+
+describe("Temperature check", () => {
+	beforeEach(() => {
+		integConfig.checks.temperature.enabled = true;
+		integConfig.notifiers = [
+			{ type: "discord", webhookUrl: `http://127.0.0.1:${server.port}` },
+		];
+		// Disable CPU so only temperature alerts are emitted
+		integConfig.checks.cpu.enabled = false;
+	});
+
+	afterEach(() => {
+		integConfig.checks.cpu.enabled = true;
+	});
+
+	test("Apple Silicon all-nulls — no alert, no incident opened", async () => {
+		// siCpuTemp is already { main: null, max: null, cores: [], socket: [], chipset: null }
+		const store = makeStore();
+		const monitor = new Monitor(store);
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(0);
+		expect(store.getActiveIncident("temp:cpu")).toBeNull();
+	});
+
+	test("SI sentinel -1 — treated as unavailable, no alert fired", async () => {
+		siCpuTemp = { main: -1, max: -1, cores: [], socket: [], chipset: null };
+		const store = makeStore();
+		const monitor = new Monitor(store);
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(0);
+		expect(store.getActiveIncident("temp:cpu")).toBeNull();
+	});
+
+	test("cores-only data below threshold — status line logged, no alert", async () => {
+		siCpuTemp = {
+			main: null,
+			max: null,
+			cores: [60, 62],
+			socket: [],
+			chipset: null,
+		};
+		const store = makeStore();
+		const monitor = new Monitor(store);
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(0);
+		expect(store.getActiveIncident("temp:cpu")).toBeNull();
+	});
+
+	test("cores-only data above threshold — fires Discord alert with highest core", async () => {
+		siCpuTemp = {
+			main: null,
+			max: null,
+			cores: [88, 90],
+			socket: [],
+			chipset: null,
+		};
+		const store = makeStore();
+		const monitor = new Monitor(store);
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(1);
+		const content = (httpLog[0]?.body as { content: string }).content;
+		expect(content).toContain("CPU TEMP");
+		expect(content).toContain("90°C");
+		expect(content).toContain("test-host");
+		expect(store.getActiveIncident("temp:cpu")).not.toBeNull();
+	});
+
+	test("max field takes priority over main when both available", async () => {
+		siCpuTemp = {
+			main: 87,
+			max: 92,
+			cores: [87, 88],
+			socket: [],
+			chipset: null,
+		};
+		const store = makeStore();
+		const monitor = new Monitor(store);
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(1);
+		expect((httpLog[0]?.body as { content: string }).content).toContain("92°C");
+	});
+
+	test("sends recovery alert when temperature drops below threshold", async () => {
+		siCpuTemp = { main: null, max: 90, cores: [], socket: [], chipset: null };
+		const store = makeStore();
+		const monitor = new Monitor(store);
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(1);
+		expect(store.getActiveIncident("temp:cpu")).not.toBeNull();
+
+		httpLog.length = 0;
+		siCpuTemp = { main: null, max: 70, cores: [], socket: [], chipset: null };
+		await monitor.runAllParallel();
+
+		expect(httpLog).toHaveLength(1);
+		expect((httpLog[0]?.body as { content: string }).content).toContain(
+			"Back to normal",
+		);
+		expect(store.getActiveIncident("temp:cpu")).toBeNull();
 	});
 });
