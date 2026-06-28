@@ -10,10 +10,10 @@ import {
 
 const WEBHOOK = "https://discord.com/api/webhooks/123456789/token";
 
+const notifyCfg = { notifiers: [{ type: "discord", webhookUrl: WEBHOOK }] };
 mock.module("../../src/config", () => ({
-	config: {
-		notifiers: [{ type: "discord", webhookUrl: WEBHOOK }],
-	},
+	config: notifyCfg,
+	getConfig: () => notifyCfg,
 }));
 
 import { logger } from "../../src/lib/logger";

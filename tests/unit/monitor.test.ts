@@ -50,6 +50,7 @@ mock.module("../../src/lib/notifiers", () => ({
 const unitCfg = {
 	machineName: "test-host",
 	reminderIntervalMinutes: 30,
+	database: { path: ":memory:" },
 	checks: {
 		cpu: { enabled: true, usageThresholdPercent: 90, consecutiveBreaches: 1 },
 		load: { enabled: true, threshold: 8.0, consecutiveBreaches: 1 },
@@ -74,32 +75,7 @@ mock.module("../../src/config", () => ({
 	getConfig: () => unitCfg,
 }));
 
-mock.module("../../src/lib/incident-store", () => ({
-	IncidentStore: class {
-		getActiveIncident(metric: string, volume?: string | null) {
-			return incidentStoreMock.getActiveIncident(metric, volume);
-		}
-		openIncident(opts: OpenIncidentOpts) {
-			return incidentStoreMock.openIncident(opts);
-		}
-		resolveIncident(id: number) {
-			return incidentStoreMock.resolveIncident(id);
-		}
-		recordNotification(opts: RecordNotificationOpts) {
-			return incidentStoreMock.recordNotification(opts);
-		}
-		getLastNotification(id: number) {
-			return incidentStoreMock.getLastNotification(id);
-		}
-		listIncidents() {
-			return incidentStoreMock.listIncidents();
-		}
-		getIncident(id: number) {
-			return incidentStoreMock.getIncident(id);
-		}
-	},
-}));
-
+import { initDb } from "../../src/lib/db";
 import type { CheckDeps } from "../../src/lib/monitor/base-check";
 import { CpuCheck } from "../../src/lib/monitor/checks/cpu";
 import { DiskCheck } from "../../src/lib/monitor/checks/disk";
@@ -180,6 +156,7 @@ beforeEach(async () => {
 	incidentStoreMock.openIncident.mockImplementation(() => fakeIncident());
 	incidentStoreMock.getLastNotification.mockImplementation(() => null);
 
+	initDb();
 	monitor = new Monitor();
 });
 
