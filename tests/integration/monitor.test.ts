@@ -62,7 +62,7 @@ import {
 } from "bun:test";
 import { initDb } from "../../src/lib/db";
 import { IncidentStore } from "../../src/lib/incident-store";
-import { Monitor } from "../../src/lib/monitor";
+import { Monitor } from "../../src/lib/monitor/index";
 
 // --- Dummy HTTP server ---
 
@@ -119,7 +119,8 @@ beforeEach(() => {
 // --- Helpers ---
 
 function makeStore(): IncidentStore {
-	return new IncidentStore(initDb(":memory:"));
+	const db = initDb(":memory:");
+	return new IncidentStore(db);
 }
 
 // --- Discord ---

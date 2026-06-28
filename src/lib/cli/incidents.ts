@@ -1,18 +1,10 @@
 /** biome-ignore-all lint/suspicious/noConsole: This prints the incidents, it's part of the CLI */
-import { loadConfig } from "../../config";
-import { getDb, initDb } from "../db";
 import { formatDate } from "../helpers";
 import { IncidentStore } from "../incident-store";
 import { logger } from "../logger";
 
-async function openIncidentDb() {
-	const cfg = await loadConfig();
-	initDb(cfg.database.path);
-	return new IncidentStore(getDb());
-}
-
 export async function listIncidents(opts: { limit: string }) {
-	const store = await openIncidentDb();
+	const store = new IncidentStore();
 	const incidents = store.listIncidents(Number(opts.limit));
 
 	if (incidents.length === 0) {
@@ -46,7 +38,7 @@ export async function listIncidents(opts: { limit: string }) {
 }
 
 export async function getIncident(id: string) {
-	const store = await openIncidentDb();
+	const store = new IncidentStore();
 	const incident = store.getIncident(Number(id));
 
 	if (!incident) {

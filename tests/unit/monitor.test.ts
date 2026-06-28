@@ -71,7 +71,6 @@ mock.module("../../src/config", () => ({
 	},
 }));
 
-import { Monitor } from "../../src/lib/monitor";
 import type { CheckDeps } from "../../src/lib/monitor/base-check";
 import { CpuCheck } from "../../src/lib/monitor/checks/cpu";
 import { DiskCheck } from "../../src/lib/monitor/checks/disk";
@@ -79,6 +78,7 @@ import { GpuCheck } from "../../src/lib/monitor/checks/gpu";
 import { LoadCheck } from "../../src/lib/monitor/checks/load";
 import { MemoryCheck } from "../../src/lib/monitor/checks/memory";
 import { TemperatureCheck } from "../../src/lib/monitor/checks/temperature";
+import { Monitor } from "../../src/lib/monitor/index";
 
 // --- Helpers ---
 

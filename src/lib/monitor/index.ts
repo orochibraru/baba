@@ -1,5 +1,5 @@
 import { config } from "../../config";
-import type { IncidentStore } from "../incident-store";
+import { IncidentStore } from "../incident-store";
 import { logger } from "../logger";
 import { Notifiers } from "../notifiers";
 import type { BaseCheck } from "./base-check";
@@ -15,10 +15,10 @@ export class Monitor {
 	private readonly notifiers: Notifiers;
 	private readonly breachCounter = new Map<string, number>();
 
-	constructor(incidentStore: IncidentStore) {
+	constructor() {
 		this.notifiers = new Notifiers();
 		const deps = {
-			incidentStore,
+			incidentStore: new IncidentStore(),
 			notifiers: this.notifiers,
 			reminderIntervalMs: config.reminderIntervalMinutes * 60_000,
 			breachCounter: this.breachCounter,

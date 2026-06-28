@@ -1,6 +1,5 @@
 import { type Config, loadConfig } from "./config";
-import { getDb, initDb } from "./lib/db";
-import { IncidentStore } from "./lib/incident-store";
+import { initDb } from "./lib/db";
 import { logger } from "./lib/logger";
 import { Monitor } from "./lib/monitor/index";
 
@@ -15,8 +14,8 @@ export class Process {
 
 	private async lazyInit() {
 		this.config = await loadConfig();
-		initDb(this.config.database.path);
-		this.monitor = new Monitor(new IncidentStore(getDb()));
+		initDb();
+		this.monitor = new Monitor();
 	}
 
 	public async start() {

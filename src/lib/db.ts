@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
+import { config } from "../config";
 
 let db: Database | undefined;
 
@@ -9,9 +10,9 @@ function initDbPath(path: string): void {
 	mkdirSync(dir, { recursive: true });
 }
 
-export function initDb(path: string): Database {
-	initDbPath(path);
-	db = new Database(path, { create: true });
+export function initDb(): Database {
+	initDbPath(config.database.path);
+	db = new Database(config.database.path, { create: true });
 	db.run("PRAGMA journal_mode = WAL;");
 	db.run(`
     CREATE TABLE IF NOT EXISTS incidents (

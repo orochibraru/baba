@@ -1,4 +1,5 @@
 import type { Database } from "bun:sqlite";
+import { getDb } from "./db";
 
 export type NotificationType = "alert" | "reminder" | "recovery";
 
@@ -37,7 +38,11 @@ export type RecordNotificationOpts = {
 };
 
 export class IncidentStore {
-	constructor(private db: Database) {}
+	private db: Database;
+
+	constructor(overrideDbInstance?: Database) {
+		this.db = overrideDbInstance ?? getDb();
+	}
 
 	openIncident(opts: OpenIncidentOpts): Incident {
 		const { metric, volume, value, threshold } = opts;
