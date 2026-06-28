@@ -1,0 +1,16 @@
+services:
+  baba:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: baba
+    restart: unless-stopped
+    # Full host system visibility for systeminformation
+    privileged: true
+    pid: host
+    network_mode: host
+    volumes:
+      - /sys:/sys:ro
+      - /dev:/dev:ro
+      - ./config.json:/app/config.json:ro
+      - ./tmp:/app/tmp

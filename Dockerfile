@@ -11,7 +11,7 @@ RUN bun build --compile --outfile /app/baba ./src/index.ts
 
 FROM alpine:latest
 
-RUN apk add --no-cache libstdc++ libgcc
+RUN apk add --no-cache libstdc++ libgcc dmidecode util-linux procps iproute2 smartmontools
 
 WORKDIR /app
 
