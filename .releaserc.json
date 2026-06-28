@@ -35,7 +35,7 @@
 			"@semantic-release/release-notes-generator",
 			{
 				"writerOpts": {
-					"footerPartial": "---\n\n## 🐳 Docker\n\n```sh\ndocker pull orochibraru/penombre:{{version}}\n```\n\n[View on Docker Hub](https://hub.docker.com/r/orochibraru/penombre)\n"
+					"footerPartial": "---\n\n## 🐳 Docker\n\n```sh\ndocker pull orochibraru/baba:{{version}}\n```\n\n[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)\n"
 				}
 			}
 		],
