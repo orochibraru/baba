@@ -1,4 +1,5 @@
-import { config } from "../../config";
+import { getConfig } from "../../config";
+import { logger } from "../logger";
 import type { AbstractNotifier } from "./abstract-notifier";
 import { DiscordNotifier } from "./discord";
 import { TelegramNotifier } from "./telegram";
@@ -7,6 +8,7 @@ export class Notifiers {
 	private readonly notifiers: AbstractNotifier[] = [];
 
 	constructor() {
+		const config = getConfig();
 		for (const notifier of config.notifiers) {
 			if (notifier.type === "discord") {
 				this.notifiers.push(
@@ -24,7 +26,7 @@ export class Notifiers {
 	}
 
 	public async alert(message: string) {
-		console.log(`Sending alert: ${message}`);
+		logger.info(`Alert: ${message}`);
 		for (const notifier of this.notifiers) {
 			await notifier.sendAlert(message);
 		}

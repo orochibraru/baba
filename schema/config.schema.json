@@ -1,187 +1,362 @@
 {
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"type": "object",
-	"properties": {
-		"$schema": {
-			"type": "string"
-		},
-		"intervalSeconds": {
-			"default": 60,
-			"type": "number",
-			"exclusiveMinimum": 0
-		},
-		"checks": {
-			"default": {
-				"cpu": {
-					"enabled": true,
-					"usageThresholdPercent": 90,
-					"tempThresholdCelsius": 85
-				},
-				"load": {
-					"enabled": true,
-					"threshold": 8
-				},
-				"memory": {
-					"enabled": true,
-					"usageThresholdPercent": 90
-				},
-				"disk": {
-					"enabled": true,
-					"usageThresholdPercent": 90,
-					"volumes": ["/"]
-				}
-			},
-			"type": "object",
-			"properties": {
-				"cpu": {
-					"default": {
-						"enabled": true,
-						"usageThresholdPercent": 90,
-						"tempThresholdCelsius": 85
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"usageThresholdPercent": {
-							"default": 90,
-							"type": "number",
-							"minimum": 0,
-							"maximum": 100
-						},
-						"tempThresholdCelsius": {
-							"default": 85,
-							"type": "number",
-							"exclusiveMinimum": 0
-						}
-					},
-					"required": [
-						"enabled",
-						"usageThresholdPercent",
-						"tempThresholdCelsius"
-					],
-					"additionalProperties": false
-				},
-				"load": {
-					"default": {
-						"enabled": true,
-						"threshold": 8
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"threshold": {
-							"default": 8,
-							"type": "number",
-							"exclusiveMinimum": 0
-						}
-					},
-					"required": ["enabled", "threshold"],
-					"additionalProperties": false
-				},
-				"memory": {
-					"default": {
-						"enabled": true,
-						"usageThresholdPercent": 90
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"usageThresholdPercent": {
-							"default": 90,
-							"type": "number",
-							"minimum": 0,
-							"maximum": 100
-						}
-					},
-					"required": ["enabled", "usageThresholdPercent"],
-					"additionalProperties": false
-				},
-				"disk": {
-					"default": {
-						"enabled": true,
-						"usageThresholdPercent": 90,
-						"volumes": ["/"]
-					},
-					"type": "object",
-					"properties": {
-						"enabled": {
-							"default": true,
-							"type": "boolean"
-						},
-						"usageThresholdPercent": {
-							"default": 90,
-							"type": "number",
-							"minimum": 0,
-							"maximum": 100
-						},
-						"volumes": {
-							"default": ["/"],
-							"minItems": 1,
-							"type": "array",
-							"items": {
-								"type": "string"
-							}
-						}
-					},
-					"required": ["enabled", "usageThresholdPercent", "volumes"],
-					"additionalProperties": false
-				}
-			},
-			"required": ["cpu", "load", "memory", "disk"],
-			"additionalProperties": false
-		},
-		"notifiers": {
-			"minItems": 1,
-			"type": "array",
-			"items": {
-				"oneOf": [
-					{
-						"type": "object",
-						"properties": {
-							"type": {
-								"type": "string",
-								"const": "discord"
-							},
-							"webhookUrl": {
-								"type": "string",
-								"format": "uri"
-							}
-						},
-						"required": ["type", "webhookUrl"],
-						"additionalProperties": false
-					},
-					{
-						"type": "object",
-						"properties": {
-							"type": {
-								"type": "string",
-								"const": "telegram"
-							},
-							"botToken": {
-								"type": "string",
-								"minLength": 1
-							},
-							"chatId": {
-								"type": "string",
-								"minLength": 1
-							}
-						},
-						"required": ["type", "botToken", "chatId"],
-						"additionalProperties": false
-					}
-				]
-			}
-		}
-	},
-	"required": ["intervalSeconds", "checks", "notifiers"],
-	"additionalProperties": false
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "machineName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "logLevel": {
+      "default": "info",
+      "type": "string",
+      "enum": [
+        "trace",
+        "debug",
+        "info",
+        "warn",
+        "error"
+      ]
+    },
+    "intervalSeconds": {
+      "default": 60,
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "reminderIntervalMinutes": {
+      "default": 30,
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "database": {
+      "default": {
+        "path": "./tmp/baba.db"
+      },
+      "type": "object",
+      "properties": {
+        "path": {
+          "default": "./tmp/baba.db",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "checks": {
+      "default": {
+        "cpu": {
+          "enabled": true,
+          "usageThresholdPercent": 90,
+          "consecutiveBreaches": 3
+        },
+        "load": {
+          "enabled": true,
+          "threshold": 8,
+          "consecutiveBreaches": 3
+        },
+        "memory": {
+          "enabled": true,
+          "usageThresholdPercent": 90,
+          "consecutiveBreaches": 3
+        },
+        "disk": {
+          "enabled": true,
+          "usageThresholdPercent": 90,
+          "volumes": [
+            "/"
+          ]
+        },
+        "temperature": {
+          "enabled": false,
+          "cpuThresholdCelsius": 85,
+          "gpuThresholdCelsius": 85,
+          "consecutiveBreaches": 3
+        },
+        "gpu": {
+          "enabled": false,
+          "vramThresholdPercent": 90,
+          "consecutiveBreaches": 3
+        }
+      },
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "default": {
+            "enabled": true,
+            "usageThresholdPercent": 90,
+            "consecutiveBreaches": 3
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "usageThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "consecutiveBreaches": {
+              "default": 3,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "enabled",
+            "usageThresholdPercent",
+            "consecutiveBreaches"
+          ],
+          "additionalProperties": false
+        },
+        "load": {
+          "default": {
+            "enabled": true,
+            "threshold": 8,
+            "consecutiveBreaches": 3
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "threshold": {
+              "default": 8,
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "consecutiveBreaches": {
+              "default": 3,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "enabled",
+            "threshold",
+            "consecutiveBreaches"
+          ],
+          "additionalProperties": false
+        },
+        "memory": {
+          "default": {
+            "enabled": true,
+            "usageThresholdPercent": 90,
+            "consecutiveBreaches": 3
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "usageThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "consecutiveBreaches": {
+              "default": 3,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "enabled",
+            "usageThresholdPercent",
+            "consecutiveBreaches"
+          ],
+          "additionalProperties": false
+        },
+        "disk": {
+          "default": {
+            "enabled": true,
+            "usageThresholdPercent": 90,
+            "volumes": [
+              "/"
+            ]
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "usageThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "volumes": {
+              "default": [
+                "/"
+              ],
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "usageThresholdPercent",
+            "volumes"
+          ],
+          "additionalProperties": false
+        },
+        "temperature": {
+          "default": {
+            "enabled": false,
+            "cpuThresholdCelsius": 85,
+            "gpuThresholdCelsius": 85,
+            "consecutiveBreaches": 3
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "cpuThresholdCelsius": {
+              "default": 85,
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "gpuThresholdCelsius": {
+              "default": 85,
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "consecutiveBreaches": {
+              "default": 3,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "enabled",
+            "cpuThresholdCelsius",
+            "gpuThresholdCelsius",
+            "consecutiveBreaches"
+          ],
+          "additionalProperties": false
+        },
+        "gpu": {
+          "default": {
+            "enabled": false,
+            "vramThresholdPercent": 90,
+            "consecutiveBreaches": 3
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "vramThresholdPercent": {
+              "default": 90,
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "consecutiveBreaches": {
+              "default": 3,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "enabled",
+            "vramThresholdPercent",
+            "consecutiveBreaches"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "cpu",
+        "load",
+        "memory",
+        "disk",
+        "temperature",
+        "gpu"
+      ],
+      "additionalProperties": false
+    },
+    "notifiers": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "discord"
+              },
+              "webhookUrl": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "type",
+              "webhookUrl"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "telegram"
+              },
+              "botToken": {
+                "type": "string",
+                "minLength": 1
+              },
+              "chatId": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "type",
+              "botToken",
+              "chatId"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "machineName",
+    "logLevel",
+    "intervalSeconds",
+    "reminderIntervalMinutes",
+    "database",
+    "checks",
+    "notifiers"
+  ],
+  "additionalProperties": false
 }

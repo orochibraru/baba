@@ -1,4 +1,7 @@
 # Baba
+>Baba is the name of a Pirate in the French comic book "Astérix". He is the one in the lookout for other ships on the Pirate's ship.
+
+## Usage
 
 ```bash
 Usage: ./baba [options] [command]
@@ -15,3 +18,12 @@ Commands:
   validate        Validate the webhooks by sending a test alert.
   help [command]  display help for command
 ```
+
+## Installation
+
+WIP
+
+## Configuration
+
+See [config.md](docs/config.md).
+See [env.md](docs/env.md).

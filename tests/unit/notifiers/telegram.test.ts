@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { logger } from "../../../src/lib/logger";
 import { TelegramNotifier } from "../../../src/lib/notifiers/telegram";
 
 const BOT_TOKEN = "123456789:ABC-DEFghijklmno";
@@ -66,14 +67,16 @@ describe("TelegramNotifier", () => {
 		});
 
 		describe("error handling", () => {
-			let consoleErrorSpy: ReturnType<typeof spyOn>;
+			let loggerErrorSpy: ReturnType<typeof spyOn>;
 
 			beforeEach(() => {
-				consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+				loggerErrorSpy = spyOn(logger, "error").mockImplementation(
+					() => logger as never,
+				);
 			});
 
 			afterEach(() => {
-				consoleErrorSpy.mockRestore();
+				loggerErrorSpy.mockRestore();
 			});
 
 			test("logs the Telegram error description when the API returns a non-ok response", async () => {
@@ -92,8 +95,8 @@ describe("TelegramNotifier", () => {
 					chatId: CHAT_ID,
 				});
 				await notifier.sendAlert("test");
-				expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-				expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain(
+				expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
+				expect(String(loggerErrorSpy.mock.calls[0]?.[0])).toContain(
 					"chat not found",
 				);
 			});
@@ -111,8 +114,8 @@ describe("TelegramNotifier", () => {
 					chatId: CHAT_ID,
 				});
 				await notifier.sendAlert("test");
-				expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-				expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain("500");
+				expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
+				expect(String(loggerErrorSpy.mock.calls[0]?.[0])).toContain("500");
 			});
 
 			test("logs an error message when fetch throws a network error", async () => {
@@ -124,9 +127,9 @@ describe("TelegramNotifier", () => {
 					chatId: CHAT_ID,
 				});
 				await notifier.sendAlert("test");
-				expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-				expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain(
-					"Failed to send alert to Telegram",
+				expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
+				expect(String(loggerErrorSpy.mock.calls[0]?.[0])).toContain(
+					"Network unreachable",
 				);
 			});
 		});

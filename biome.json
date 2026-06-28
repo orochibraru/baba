@@ -6,7 +6,8 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!schema", "!docs"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -15,7 +16,18 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"preset": "recommended"
+			"preset": "recommended",
+			"suspicious": {
+				"noConsole": "error"
+			},
+			"complexity": {
+				"useMaxParams": {
+					"level": "error",
+					"options": {
+						"max": 2
+					}
+				}
+			}
 		}
 	},
 	"javascript": {

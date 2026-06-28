@@ -10,12 +10,13 @@ import {
 
 const WEBHOOK = "https://discord.com/api/webhooks/123456789/token";
 
+const notifyCfg = { notifiers: [{ type: "discord", webhookUrl: WEBHOOK }] };
 mock.module("../../src/config", () => ({
-	config: {
-		notifiers: [{ type: "discord", webhookUrl: WEBHOOK }],
-	},
+	config: notifyCfg,
+	getConfig: () => notifyCfg,
 }));
 
+import { logger } from "../../src/lib/logger";
 import { Notifiers } from "../../src/lib/notifiers";
 
 let fetchSpy: ReturnType<typeof spyOn<typeof globalThis, "fetch">>;
@@ -43,14 +44,16 @@ describe("notify", () => {
 	});
 
 	test("logs the alert message to console before dispatching", async () => {
-		const consoleSpy = spyOn(console, "log").mockImplementation(() => {});
+		const loggerSpy = spyOn(logger, "info").mockImplementation(
+			() => logger as never,
+		);
 		const notifiers = new Notifiers();
 		await notifiers.alert("Disk full");
 		expect(
-			consoleSpy.mock.calls.some((args) =>
+			loggerSpy.mock.calls.some((args) =>
 				String(args[0]).includes("Disk full"),
 			),
 		).toBe(true);
-		consoleSpy.mockRestore();
+		loggerSpy.mockRestore();
 	});
 });

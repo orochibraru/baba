@@ -67,11 +67,23 @@ jobs:
       - name: Linting
         run: bun run lint
 
-      - name: Test
-        run: bun test --bail
+      - name: Test (unit)
+        run: bun test --bail tests/unit
 
-      - name: Test (isolated)
+      - name: Test (all, isolated)
         run: bun test --bail --isolate
+
+      - name: Ensure schema is up to date
+        run: |
+          echo "Ensuring schema is up to date..."
+          bun run gen:schema
+          git diff --exit-code
+
+      - name: Ensure docs are up to date
+        run: |
+          echo "Ensuring docs are up to date..."
+          bun run gen:docs
+          git diff --exit-code
 
   # ===========================================
   # Docker: Build — only when Docker files change

@@ -35,3 +35,7 @@ config.json
 
 # Finder (MacOS) folder config
 .DS_Store
+tmp/
+*.db
+*.db-shm
+*.db-wal

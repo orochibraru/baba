@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logger } from "../logger";
 import { AbstractNotifier } from "./abstract-notifier";
 
 export const discordNotifierSchema = z
@@ -25,6 +26,7 @@ export class DiscordNotifier extends AbstractNotifier {
 	}
 
 	async sendAlert(message: string): Promise<void> {
+		logger.debug(`[discord] POST ${this.webhookUrl}`);
 		try {
 			const res = await fetch(this.webhookUrl, {
 				method: "POST",
@@ -32,12 +34,13 @@ export class DiscordNotifier extends AbstractNotifier {
 				body: JSON.stringify({ content: message, username: "Baba" }),
 			});
 			if (!res.ok) {
-				console.error(
-					`Discord webhook returned ${res.status}: ${await res.text()}`,
-				);
+				const body = await res.text();
+				logger.error(`[discord] ${res.status}: ${body}`);
+			} else {
+				logger.debug(`[discord] delivered (${res.status})`);
 			}
 		} catch (error) {
-			console.error("Failed to send alert to Discord:", error);
+			logger.error(`[discord] network error: ${error}`);
 		}
 	}
 }

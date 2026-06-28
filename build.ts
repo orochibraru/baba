@@ -1,3 +1,5 @@
+import { logger } from "./src/lib/logger";
+
 enum Architecture {
 	X64 = "x64",
 	ARM64 = "arm64",
@@ -48,7 +50,7 @@ async function main() {
 	try {
 		const targets = buildTargets();
 		for (const target of targets) {
-			console.log(`Building ${target}...`);
+			logger.info(`Building ${target}...`);
 			const res = await Bun.build({
 				entrypoints: ["./src/index.ts"],
 				compile: {
@@ -62,12 +64,11 @@ async function main() {
 			}
 		}
 	} catch (e) {
-		console.error("Failed to build package.", e);
-		errors.push(`Failed to build package: ${e}`);
+		errors.push(`Failed to build package: ${JSON.stringify(e)}`);
 	}
 
 	if (errors.length > 0) {
-		console.error("Build errors:", errors);
+		logger.error(`Build errors: ${JSON.stringify(errors)}`);
 	}
 }
 

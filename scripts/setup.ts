@@ -1,5 +1,6 @@
 import si from "systeminformation";
 import { humanReadableBytes } from "../src/lib/helpers";
+import { logger } from "../src/lib/logger";
 
 export async function setup() {
 	const readableVolumes: {
@@ -12,7 +13,7 @@ export async function setup() {
 		rawSize: number;
 	}[] = [];
 
-	console.log("Fetching volume information...");
+	logger.info("Fetching volume information...");
 	const volumes = await si.fsSize();
 	for (const vol of volumes) {
 		readableVolumes.push({
@@ -27,34 +28,34 @@ export async function setup() {
 	}
 
 	if (readableVolumes.length === 0) {
-		console.log("No volumes found.");
+		logger.error("No volumes found.");
 		process.exit(0);
 	}
 
-	console.log(`Found ${readableVolumes.length} volume(s)`);
+	logger.info(`Found ${readableVolumes.length} volume(s)`);
 
 	// Sort by size
 	const sortedVolumes = readableVolumes.sort((a, b) => b.rawSize - a.rawSize);
 
 	const likelyRootVolume = sortedVolumes[0];
 	if (!likelyRootVolume) {
-		console.log("No volumes found.");
+		logger.error("No volumes found.");
 		process.exit(0);
 	}
 
-	console.log("---");
-	console.log("---");
-	console.log("---");
-	console.log("Likely your root volume:");
-	console.log(
+	logger.info("---");
+	logger.info("---");
+	logger.info("---");
+	logger.info("Likely your root volume:");
+	logger.info(
 		`${likelyRootVolume.name}: ${likelyRootVolume.totalSize} (${likelyRootVolume.usePercentage}%) mounted at ${likelyRootVolume.mountPoint}`,
 	);
-	console.log("---");
-	console.log("---");
-	console.log("---");
-	console.log("Other volumes:");
+	logger.info("---");
+	logger.info("---");
+	logger.info("---");
+	logger.info("Other volumes:");
 	for (const volume of sortedVolumes.slice(1)) {
-		console.log(
+		logger.info(
 			`${volume.name}: ${volume.totalSize} (${volume.usePercentage}%) mounted at ${volume.mountPoint}`,
 		);
 	}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logger } from "../logger";
 import { AbstractNotifier } from "./abstract-notifier";
 
 export const telegramNotifierSchema = z
@@ -37,8 +38,9 @@ export class TelegramNotifier extends AbstractNotifier {
 	}
 
 	async sendAlert(message: string): Promise<void> {
+		const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
+		logger.debug(`[telegram] POST sendMessage (chat: ${this.chatId})`);
 		try {
-			const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
 			const res = await fetch(url, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -46,12 +48,14 @@ export class TelegramNotifier extends AbstractNotifier {
 			});
 			if (!res.ok) {
 				const body = (await res.json()) as { description?: string };
-				console.error(
-					`Telegram API returned ${res.status}: ${body.description ?? res.statusText}`,
+				logger.error(
+					`[telegram] ${res.status}: ${body.description ?? res.statusText}`,
 				);
+			} else {
+				logger.debug(`[telegram] delivered (${res.status})`);
 			}
 		} catch (error) {
-			console.error("Failed to send alert to Telegram:", error);
+			logger.error(`[telegram] network error: ${error}`);
 		}
 	}
 }

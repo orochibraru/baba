@@ -14,3 +14,7 @@ export function humanReadableBytes(bytes: number): string {
 
 	return `${bytes.toFixed(2)} ${units[unitIndex]}`;
 }
+
+export function formatDate(ms: number): string {
+	return new Date(ms).toISOString().replace("T", " ").slice(0, 19);
+}

@@ -1,10 +1,11 @@
 import { type Config, loadConfig } from "./config";
-import { Monitor } from "./lib/monitor";
+import { initDb } from "./lib/db";
+import { logger } from "./lib/logger";
+import { Monitor } from "./lib/monitor/index";
 
 export class Process {
 	private config: Config | undefined;
 	private monitor: Monitor | undefined;
-	private runCount: number = 0;
 	private interval: NodeJS.Timeout | undefined;
 
 	constructor() {
@@ -13,11 +14,8 @@ export class Process {
 
 	private async lazyInit() {
 		this.config = await loadConfig();
+		initDb();
 		this.monitor = new Monitor();
-	}
-
-	private isOneOfTenRuns() {
-		return this.runCount % 10 === 0;
 	}
 
 	public async start() {
@@ -26,11 +24,13 @@ export class Process {
 		}
 
 		try {
-			console.log("Starting up...");
+			logger.info("Starting up...");
 			await this.monitor.runAllParallel();
-			console.log("Alerter started.");
+			logger.info(
+				`Service is running. Will check every ${this.config.intervalSeconds} seconds.`,
+			);
 		} catch (error) {
-			console.error("Error during startup:", error);
+			logger.error(`Error during startup: ${JSON.stringify(error)}`);
 			process.exit(1);
 		}
 
@@ -40,12 +40,8 @@ export class Process {
 			}
 			try {
 				await this.monitor.runAllParallel();
-				this.runCount++;
-				if (this.isOneOfTenRuns()) {
-					await this.monitor.refreshDisks();
-				}
 			} catch (error) {
-				console.error("Error monitoring server:", error);
+				logger.error(`Error monitoring server: ${JSON.stringify(error)}`);
 			}
 		}, this.config.intervalSeconds * 1000);
 
@@ -59,13 +55,13 @@ export class Process {
 
 		process.on("uncaughtException", (error) => {
 			this.shutdown();
-			console.error("Uncaught exception:", error);
+			logger.error(`Uncaught exception: ${JSON.stringify(error)}`);
 			process.exit(1);
 		});
 	}
 
 	public shutdown() {
-		console.log("Alerter shutting down...");
+		logger.info("Shutting down...");
 		if (this.interval) {
 			clearInterval(this.interval);
 		}

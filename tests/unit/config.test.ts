@@ -11,6 +11,12 @@ const minimal = {
 
 describe("ConfigSchema", () => {
 	describe("defaults", () => {
+		test("applies default logLevel of info", () => {
+			const r = ConfigSchema.safeParse(minimal);
+			expect(r.success).toBe(true);
+			if (r.success) expect(r.data.logLevel).toBe("info");
+		});
+
 		test("applies default intervalSeconds of 60", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
@@ -23,7 +29,7 @@ describe("ConfigSchema", () => {
 			if (r.success) {
 				expect(r.data.checks.cpu.enabled).toBe(true);
 				expect(r.data.checks.cpu.usageThresholdPercent).toBe(90);
-				expect(r.data.checks.cpu.tempThresholdCelsius).toBe(85);
+				expect(r.data.checks.cpu.consecutiveBreaches).toBe(3);
 			}
 		});
 
@@ -33,6 +39,7 @@ describe("ConfigSchema", () => {
 			if (r.success) {
 				expect(r.data.checks.load.enabled).toBe(true);
 				expect(r.data.checks.load.threshold).toBe(8);
+				expect(r.data.checks.load.consecutiveBreaches).toBe(3);
 			}
 		});
 
@@ -42,6 +49,7 @@ describe("ConfigSchema", () => {
 			if (r.success) {
 				expect(r.data.checks.memory.enabled).toBe(true);
 				expect(r.data.checks.memory.usageThresholdPercent).toBe(90);
+				expect(r.data.checks.memory.consecutiveBreaches).toBe(3);
 			}
 		});
 
@@ -54,6 +62,39 @@ describe("ConfigSchema", () => {
 				expect(r.data.checks.disk.volumes).toEqual(["/"]);
 			}
 		});
+
+		test("applies default temperature check values", () => {
+			const r = ConfigSchema.safeParse(minimal);
+			expect(r.success).toBe(true);
+			if (r.success) {
+				expect(r.data.checks.temperature.enabled).toBe(false);
+				expect(r.data.checks.temperature.cpuThresholdCelsius).toBe(85);
+				expect(r.data.checks.temperature.gpuThresholdCelsius).toBe(85);
+				expect(r.data.checks.temperature.consecutiveBreaches).toBe(3);
+			}
+		});
+
+		test("applies default gpu check values", () => {
+			const r = ConfigSchema.safeParse(minimal);
+			expect(r.success).toBe(true);
+			if (r.success) {
+				expect(r.data.checks.gpu.enabled).toBe(false);
+				expect(r.data.checks.gpu.vramThresholdPercent).toBe(90);
+				expect(r.data.checks.gpu.consecutiveBreaches).toBe(3);
+			}
+		});
+
+		test("applies default reminderIntervalMinutes of 30", () => {
+			const r = ConfigSchema.safeParse(minimal);
+			expect(r.success).toBe(true);
+			if (r.success) expect(r.data.reminderIntervalMinutes).toBe(30);
+		});
+
+		test("applies default database path", () => {
+			const r = ConfigSchema.safeParse(minimal);
+			expect(r.success).toBe(true);
+			if (r.success) expect(r.data.database.path).toBe("./tmp/baba.db");
+		});
 	});
 
 	describe("custom values", () => {
@@ -61,6 +102,20 @@ describe("ConfigSchema", () => {
 			const r = ConfigSchema.safeParse({ ...minimal, intervalSeconds: 30 });
 			expect(r.success).toBe(true);
 			if (r.success) expect(r.data.intervalSeconds).toBe(30);
+		});
+
+		test("accepts valid logLevel values", () => {
+			for (const level of [
+				"trace",
+				"debug",
+				"info",
+				"warn",
+				"error",
+			] as const) {
+				const r = ConfigSchema.safeParse({ ...minimal, logLevel: level });
+				expect(r.success).toBe(true);
+				if (r.success) expect(r.data.logLevel).toBe(level);
+			}
 		});
 
 		test("accepts $schema field without failing", () => {
@@ -80,7 +135,7 @@ describe("ConfigSchema", () => {
 			if (r.success) {
 				expect(r.data.checks.cpu.usageThresholdPercent).toBe(70);
 				expect(r.data.checks.cpu.enabled).toBe(true);
-				expect(r.data.checks.cpu.tempThresholdCelsius).toBe(85);
+				expect(r.data.checks.cpu.consecutiveBreaches).toBe(3);
 			}
 		});
 
@@ -247,6 +302,15 @@ describe("ConfigSchema", () => {
 			expect(r.success).toBe(false);
 		});
 
+		test("rejects an invalid logLevel", () => {
+			const r = ConfigSchema.safeParse({ ...minimal, logLevel: "verbose" });
+			expect(r.success).toBe(false);
+			if (!r.success)
+				expect(r.error.issues[0]?.message).toContain(
+					'Must be one of: "trace", "debug"',
+				);
+		});
+
 		test("rejects zero intervalSeconds", () => {
 			const r = ConfigSchema.safeParse({ ...minimal, intervalSeconds: 0 });
 			expect(r.success).toBe(false);
@@ -330,7 +394,7 @@ describe("ConfigSchema", () => {
 });
 
 describe("loadConfig", () => {
-	const TMP = "/tmp/homelab-alerter-test-config.json";
+	const TMP = "/tmp/baba-test-config.json";
 
 	afterEach(async () => {
 		try {

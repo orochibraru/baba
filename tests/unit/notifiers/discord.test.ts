@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { logger } from "../../../src/lib/logger";
 import { DiscordNotifier } from "../../../src/lib/notifiers/discord";
 
 const WEBHOOK = "https://discord.com/api/webhooks/123456789/token";
@@ -43,14 +44,16 @@ describe("sendDiscordAlert", () => {
 	});
 
 	describe("error handling", () => {
-		let consoleErrorSpy: ReturnType<typeof spyOn>;
+		let loggerErrorSpy: ReturnType<typeof spyOn>;
 
 		beforeEach(() => {
-			consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+			loggerErrorSpy = spyOn(logger, "error").mockImplementation(
+				() => logger as never,
+			);
 		});
 
 		afterEach(() => {
-			consoleErrorSpy.mockRestore();
+			loggerErrorSpy.mockRestore();
 		});
 
 		test("logs the status code when webhook returns a non-ok response", async () => {
@@ -62,8 +65,8 @@ describe("sendDiscordAlert", () => {
 			);
 			const notifier = new DiscordNotifier({ webhookUrl: WEBHOOK });
 			await notifier.sendAlert("test");
-			expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-			expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain("400");
+			expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
+			expect(String(loggerErrorSpy.mock.calls[0]?.[0])).toContain("400");
 		});
 
 		test("logs an error message when fetch throws a network error", async () => {
@@ -72,9 +75,9 @@ describe("sendDiscordAlert", () => {
 			}) as unknown as typeof fetch);
 			const notifier = new DiscordNotifier({ webhookUrl: WEBHOOK });
 			await notifier.sendAlert("test");
-			expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-			expect(String(consoleErrorSpy.mock.calls[0]?.[0])).toContain(
-				"Failed to send alert to Discord",
+			expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
+			expect(String(loggerErrorSpy.mock.calls[0]?.[0])).toContain(
+				"Network unreachable",
 			);
 		});
 	});
