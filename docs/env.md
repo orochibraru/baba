@@ -9,7 +9,7 @@ Values are applied **before** Zod validation, so type coercion and defaults stil
 | `BABA_MACHINE_NAME` | string | `(system hostname)` | `nas-01` | Display name for this machine, prepended to every alert message. |
 | `BABA_INTERVAL_SECONDS` | number | `60` | `30` | Seconds between monitor check cycles. |
 | `BABA_REMINDER_INTERVAL_MINUTES` | number | `30` | `60` | Minutes before re-alerting for an ongoing incident. |
-| `BABA_DATABASE_PATH` | string | `./tmp/baba.db` | `/data/baba.db` | Path to the SQLite incident database. |
+| `BABA_DATABASE_PATH` | string | `/var/lib/baba/baba.db` | `/data/baba.db` | Path to the SQLite incident database. |
 | `BABA_CPU_ENABLED` | boolean | `true` | — | Enable CPU usage monitoring. |
 | `BABA_CPU_THRESHOLD` | number | `90` | `80` | CPU usage % that triggers an alert. |
 | `BABA_CPU_CONSECUTIVE_BREACHES` | number | `3` | — | Consecutive high readings before opening a CPU incident. |
@@ -29,6 +29,7 @@ Values are applied **before** Zod validation, so type coercion and defaults stil
 | `BABA_GPU_ENABLED` | boolean | `false` | — | Enable GPU utilization monitoring. Off by default; metrics unavailable on macOS. |
 | `BABA_GPU_THRESHOLD` | number | `90` | `85` | GPU utilization % that triggers an alert. |
 | `BABA_GPU_CONSECUTIVE_BREACHES` | number | `3` | — | Consecutive high readings before opening a GPU incident. |
+| `BABA_UPDATES_NOTIFY_ENABLED` | boolean | `true` | — | Send an alert via your configured notifiers when a newer release is available. |
 
 ## Notifiers
 

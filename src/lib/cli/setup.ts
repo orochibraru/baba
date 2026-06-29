@@ -115,7 +115,7 @@ export async function setup({ configPath, deps }: SetupArgs): Promise<void> {
 	);
 	const databasePath = await ask.str(
 		"Database path",
-		String(database.path ?? "./tmp/baba.db"),
+		String(database.path ?? "/var/lib/baba/baba.db"),
 	);
 
 	// ── Notifiers ─────────────────────────────────────────────────────────────

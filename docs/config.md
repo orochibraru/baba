@@ -11,7 +11,7 @@ Every field is optional (defaults are applied) except `notifiers`.
 | `logLevel` | `trace` \| `debug` \| `info` \| `warn` \| `error` | `info` | Log verbosity. One of: `trace`, `debug`, `info`, `warn`, `error`. |
 | `intervalSeconds` | number | `60` | Seconds between monitor check cycles. |
 | `reminderIntervalMinutes` | number | `30` | Minutes before re-alerting for an ongoing incident. |
-| `database.path` | string | `./tmp/baba.db` | Path to the SQLite incident database. |
+| `database.path` | string | `/var/lib/baba/baba.db` | Path to the SQLite incident database. |
 | `checks.cpu.enabled` | boolean | `true` | Enable CPU usage monitoring. |
 | `checks.cpu.usageThresholdPercent` | number | `90` | CPU usage % that triggers an alert. |
 | `checks.cpu.consecutiveBreaches` | integer | `3` | Consecutive high readings before opening a CPU incident. |
@@ -31,6 +31,7 @@ Every field is optional (defaults are applied) except `notifiers`.
 | `checks.gpu.enabled` | boolean | `false` | Enable GPU utilization monitoring. Off by default; metrics unavailable on macOS. |
 | `checks.gpu.vramThresholdPercent` | number | `90` | GPU utilization % that triggers an alert. |
 | `checks.gpu.consecutiveBreaches` | integer | `3` | Consecutive high readings before opening a GPU incident. |
+| `updates.notifyEnabled` | boolean | `true` | Send an alert via your configured notifiers when a newer release is available. |
 | `notifiers` | NotifierConfig[] | **required** | One or more notification destinations. See [Notifiers](#notifiers) below. |
 
 ## Notifiers

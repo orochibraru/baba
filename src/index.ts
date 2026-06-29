@@ -5,6 +5,7 @@ import { isConfigLoaded } from "./config";
 import { health } from "./lib/cli/health";
 import { getIncident, listIncidents } from "./lib/cli/incidents";
 import { runSetup } from "./lib/cli/setup";
+import { runUpdate } from "./lib/cli/update";
 import { validate } from "./lib/cli/validate";
 import { logger } from "./lib/logger";
 import { Process } from "./process";
@@ -20,7 +21,7 @@ program
 	.option(
 		"--config <path>",
 		"Path to config.json",
-		process.env.BABA_CONFIG_PATH ?? "./config.json",
+		process.env.BABA_CONFIG_PATH ?? "/var/lib/baba/config.json",
 	)
 	.action(async (opts: { config: string }) => {
 		logger.debug("CMD called: start");
@@ -41,7 +42,7 @@ program
 	.option(
 		"--config <path>",
 		"Path to config.json",
-		process.env.BABA_CONFIG_PATH ?? "./config.json",
+		process.env.BABA_CONFIG_PATH ?? "/var/lib/baba/config.json",
 	)
 	.action(async (opts: { config: string }) => {
 		await health(opts.config);
@@ -55,11 +56,19 @@ program
 	.option(
 		"--config <path>",
 		"Path to write config.json",
-		process.env.BABA_CONFIG_PATH ?? "./config.json",
+		process.env.BABA_CONFIG_PATH ?? "/var/lib/baba/config.json",
 	)
 	.action(async (opts: { config: string }) => {
 		logger.debug("CMD called: setup");
 		await runSetup(opts.config);
+	});
+
+program
+	.command("update")
+	.description("Check for a newer release and replace the binary in-place.")
+	.action(async () => {
+		logger.debug("CMD called: update");
+		await runUpdate();
 	});
 
 program

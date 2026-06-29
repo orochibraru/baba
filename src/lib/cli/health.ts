@@ -34,7 +34,7 @@ export async function runChecks(
 	const results: CheckResult[] = [];
 
 	// 1. Config is valid and has at least one notifier configured
-	let dbPath = "./tmp/baba.db";
+	let dbPath = "/var/lib/baba/baba.db";
 	try {
 		const config = await deps.loadConfig(configPath);
 		dbPath = config.database.path;

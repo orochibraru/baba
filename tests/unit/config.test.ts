@@ -98,7 +98,7 @@ describe("ConfigSchema", () => {
 		test("applies default database path", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.database.path).toBe("./tmp/baba.db");
+			if (r.success) expect(r.data.database.path).toBe("/var/lib/baba/baba.db");
 		});
 	});
 

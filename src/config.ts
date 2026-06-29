@@ -120,8 +120,14 @@ const DatabaseSchema = z.object({
 	path: z
 		.string({ error: "Must be a string" })
 		.min(1, "Database path cannot be empty")
-		.default("./tmp/baba.db"),
+		.default("/var/lib/baba/baba.db"),
 });
+
+const UpdatesSchema = z.object({
+	notifyEnabled: z.boolean({ error: "Must be true or false" }).default(true),
+});
+
+export type Updates = z.infer<typeof UpdatesSchema>;
 
 export const ConfigSchema = z.object({
 	$schema: z.string().optional(),
@@ -146,6 +152,7 @@ export const ConfigSchema = z.object({
 		.default(30),
 	database: DatabaseSchema.default(DatabaseSchema.parse({})),
 	checks: ChecksSchema.default(ChecksSchema.parse({})),
+	updates: UpdatesSchema.default(UpdatesSchema.parse({})),
 	notifiers: z
 		.array(NotifierSchema, { error: "Must be an array of notifier objects" })
 		.min(1, "At least one notifier must be configured"),
@@ -240,7 +247,10 @@ function applyEnvOverrides(raw: Record<string, unknown>): void {
 
 // ── loadConfig ────────────────────────────────────────────────────────────────
 
-export async function loadConfig(path = "./config.json"): Promise<Config> {
+const DEFAULT_CONFIG_PATH = "/var/lib/baba/config.json";
+const DEFAULT_CONFIG_TEMPLATE = "/var/lib/baba/config.default.json";
+
+export async function loadConfig(path = DEFAULT_CONFIG_PATH): Promise<Config> {
 	logger.debug(`Loading config from ${path}...`);
 	const file = Bun.file(path);
 	let raw: Record<string, unknown> = {};
@@ -248,9 +258,20 @@ export async function loadConfig(path = "./config.json"): Promise<Config> {
 		logger.debug("Parsing config...");
 		raw = JSON.parse(await file.text()) as Record<string, unknown>;
 	} else {
-		logger.info(
-			`No config file at "${path}", relying on environment variables.`,
-		);
+		// Self-heal: restore from the immutable default template if available
+		const template = Bun.file(DEFAULT_CONFIG_TEMPLATE);
+		if (await template.exists()) {
+			logger.warn(
+				`Config not found at "${path}" — restoring from ${DEFAULT_CONFIG_TEMPLATE}. Run 'baba setup' to reconfigure.`,
+			);
+			const text = await template.text();
+			await Bun.write(path, text);
+			raw = JSON.parse(text) as Record<string, unknown>;
+		} else {
+			logger.info(
+				`No config file at "${path}", relying on environment variables.`,
+			);
+		}
 	}
 	applyEnvOverrides(raw);
 	applyNotifierEnvOverrides(raw);

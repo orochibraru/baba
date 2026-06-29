@@ -44,7 +44,7 @@ export const ENV_VARS: Record<string, EnvVarDef> = {
 		path: ["database", "path"],
 		type: "string",
 		description: "Path to the SQLite incident database.",
-		default: "./tmp/baba.db",
+		default: "/var/lib/baba/baba.db",
 		example: "/data/baba.db",
 	},
 	// ── CPU ───────────────────────────────────────────────────────────────────
@@ -183,5 +183,14 @@ export const ENV_VARS: Record<string, EnvVarDef> = {
 		type: "number",
 		description: "Consecutive high readings before opening a GPU incident.",
 		default: "3",
+	},
+
+	// ── Updates ───────────────────────────────────────────────────────────────
+	BABA_UPDATES_NOTIFY_ENABLED: {
+		path: ["updates", "notifyEnabled"],
+		type: "boolean",
+		description:
+			"Send an alert via your configured notifiers when a newer release is available.",
+		default: "true",
 	},
 };

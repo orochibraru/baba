@@ -5,7 +5,11 @@ REPO="orochibraru/baba"
 BIN_NAME="baba"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 VERSION="${VERSION:-latest}"
-CONFIG_PATH="${CONFIG_PATH:-./config.json}"
+LIB_DIR="/var/lib/baba"
+CONFIG_DEFAULT="${LIB_DIR}/config.default.json"
+CONFIG_PATH="${CONFIG_PATH:-${LIB_DIR}/config.json}"
+
+RAW_BASE="https://raw.githubusercontent.com/${REPO}/main"
 
 # ── Detect OS ─────────────────────────────────────────────────────────────────
 
@@ -52,51 +56,88 @@ if [ "${DRY_RUN:-}" = "1" ]; then
     exit 0
 fi
 
-# ── Download ──────────────────────────────────────────────────────────────────
+# ── Helper: fetch URL to destination, using sudo if directory isn't writable ──
 
-TMP_FILE="$(mktemp)"
+_fetch_to() {
+    local url="$1" dest="$2"
+    local dir
+    dir="$(dirname "$dest")"
+    local tmp
+    tmp="$(mktemp)"
+    if command -v curl >/dev/null 2>&1; then
+        curl -fsSL "$url" -o "$tmp"
+    elif command -v wget >/dev/null 2>&1; then
+        wget -qO "$tmp" "$url"
+    else
+        echo "Error: curl or wget is required" >&2
+        rm -f "$tmp"
+        return 1
+    fi
+    if [ -w "$dir" ]; then
+        mv "$tmp" "$dest"
+    else
+        sudo mv "$tmp" "$dest"
+    fi
+}
+
+# ── Download binary ───────────────────────────────────────────────────────────
+
 echo "Downloading $ASSET..."
-
+TMP_BIN="$(mktemp)"
 if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE"
+    curl -fsSL "$DOWNLOAD_URL" -o "$TMP_BIN"
 elif command -v wget >/dev/null 2>&1; then
-    wget -qO "$TMP_FILE" "$DOWNLOAD_URL"
+    wget -qO "$TMP_BIN" "$DOWNLOAD_URL"
 else
     echo "Error: curl or wget is required" >&2
     exit 1
 fi
+chmod +x "$TMP_BIN"
 
-chmod +x "$TMP_FILE"
-
-# ── Install ───────────────────────────────────────────────────────────────────
+# ── Install binary ────────────────────────────────────────────────────────────
 
 DEST="${INSTALL_DIR}/${BIN_NAME}"
-
 if [ -w "$INSTALL_DIR" ]; then
-    mv "$TMP_FILE" "$DEST"
+    mv "$TMP_BIN" "$DEST"
 else
     echo "Installing to $DEST (requires sudo)..."
-    sudo mv "$TMP_FILE" "$DEST"
+    sudo mv "$TMP_BIN" "$DEST"
 fi
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# ── Create data directory ─────────────────────────────────────────────────────
+
+if [ ! -d "$LIB_DIR" ]; then
+    echo "Creating $LIB_DIR..."
+    if [ -w "$(dirname "$LIB_DIR")" ]; then
+        mkdir -p "$LIB_DIR"
+    else
+        sudo mkdir -p "$LIB_DIR"
+        # Give ownership to the invoking user so baba can write without sudo
+        sudo chown "$(id -un)" "$LIB_DIR" 2>/dev/null || true
+    fi
+fi
+
+# ── Always refresh the immutable default template ─────────────────────────────
+
+printf "Refreshing default config template at %s..." "$CONFIG_DEFAULT"
+if _fetch_to "${RAW_BASE}/config.example.json" "$CONFIG_DEFAULT" 2>/dev/null; then
+    echo " done."
+else
+    echo " failed (skipping)."
+fi
+
+# ── Seed config.json only if it doesn't already exist ────────────────────────
 
 echo ""
 if [ -f "$CONFIG_PATH" ]; then
     echo "Config already exists at $CONFIG_PATH — keeping it."
-else
-    printf "Downloading example config to %s..." "$CONFIG_PATH"
-    if command -v curl >/dev/null 2>&1; then
-        curl -fsSL "https://raw.githubusercontent.com/${REPO}/main/config.example.json" -o "$CONFIG_PATH"
-        echo " done."
-    elif command -v wget >/dev/null 2>&1; then
-        wget -qO "$CONFIG_PATH" "https://raw.githubusercontent.com/${REPO}/main/config.example.json"
-        echo " done."
+elif [ -f "$CONFIG_DEFAULT" ]; then
+    if [ -w "$LIB_DIR" ]; then
+        cp "$CONFIG_DEFAULT" "$CONFIG_PATH"
     else
-        echo ""
-        echo "Note: curl and wget not found — could not download example config."
-        echo "Download it from: https://github.com/${REPO}/blob/main/config.example.json"
+        sudo cp "$CONFIG_DEFAULT" "$CONFIG_PATH"
     fi
+    echo "Created $CONFIG_PATH from default template."
 fi
 
 echo ""

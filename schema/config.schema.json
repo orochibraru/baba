@@ -32,12 +32,12 @@
     },
     "database": {
       "default": {
-        "path": "./tmp/baba.db"
+        "path": "/var/lib/baba/baba.db"
       },
       "type": "object",
       "properties": {
         "path": {
-          "default": "./tmp/baba.db",
+          "default": "/var/lib/baba/baba.db",
           "type": "string",
           "minLength": 1
         }
@@ -299,6 +299,22 @@
       ],
       "additionalProperties": false
     },
+    "updates": {
+      "default": {
+        "notifyEnabled": true
+      },
+      "type": "object",
+      "properties": {
+        "notifyEnabled": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "notifyEnabled"
+      ],
+      "additionalProperties": false
+    },
     "notifiers": {
       "minItems": 1,
       "type": "array",
@@ -359,6 +375,7 @@
     "reminderIntervalMinutes",
     "database",
     "checks",
+    "updates",
     "notifiers"
   ],
   "additionalProperties": false

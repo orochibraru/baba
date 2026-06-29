@@ -5,7 +5,7 @@
 	"intervalSeconds": 60,
 	"reminderIntervalMinutes": 30,
 	"database": {
-		"path": "./tmp/baba.db"
+		"path": "/var/lib/baba/baba.db"
 	},
 	"checks": {
 		"cpu": {
@@ -39,6 +39,9 @@
 			"vramThresholdPercent": 90,
 			"consecutiveBreaches": 3
 		}
+	},
+	"updates": {
+		"notifyEnabled": true
 	},
 	"notifiers": [
 		{
