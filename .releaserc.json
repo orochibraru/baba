@@ -86,7 +86,7 @@
 						"label": "Windows ARM64"
 					},
 					{
-						"path": "install.sh",
+						"path": "scripts/install.sh",
 						"name": "install.sh",
 						"label": "Install Script (Linux / macOS)"
 					},

@@ -15,6 +15,25 @@ Baba is a lightweight homelab monitor that sends Discord or Telegram alerts when
 
 ## Quick start
 
+### Install script (Linux / macOS)
+
+```bash
+curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
+```
+
+Detects your OS and architecture, downloads the right binary, and installs it to `/usr/local/bin/baba`. Then:
+
+```bash
+# 1. Download and edit the example config
+curl -o config.json https://raw.githubusercontent.com/orochibraru/baba/main/config.example.json
+# Edit config.json — at minimum, add your notifier credentials
+
+# 2. Run
+baba start
+```
+
+To install to a custom location: `INSTALL_DIR=~/.local/bin curl -fsSL … | sh`
+
 ### Docker Compose
 
 ```bash
@@ -28,14 +47,13 @@ curl -o compose.yaml https://raw.githubusercontent.com/orochibraru/baba/main/com
 docker compose up -d
 ```
 
-### Binary
+### Binary (manual)
 
-Download the latest binary for your platform from the [releases page](https://github.com/orochibraru/baba/releases), then:
+Download the binary for your platform from the [releases page](https://github.com/orochibraru/baba/releases), then:
 
 ```bash
 # 1. Copy and edit config
-curl -O https://raw.githubusercontent.com/orochibraru/baba/main/config.example.json
-mv config.example.json config.json
+curl -o config.json https://raw.githubusercontent.com/orochibraru/baba/main/config.example.json
 
 # 2. Run
 ./baba start
@@ -79,7 +97,7 @@ docker run -d \
   -v /sys:/sys:ro \
   -v /dev:/dev:ro \
   -v /path/to/data:/app/tmp \
-  -e BABA_NOTIFIERS='[{"type":"discord","webhookUrl":"https://discord.com/api/webhooks/…"}]' \
+  -e BABA_NOTIFIERS_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/… \
   orochibraru/baba:latest
 ```
 
