@@ -1,3 +1,20 @@
+## [1.0.6](https://github.com/orochibraru/baba/compare/v1.0.5...v1.0.6) (2026-06-29)
+
+
+### Bug Fixes
+
+* release script & docs ([b2cbcef](https://github.com/orochibraru/baba/commit/b2cbcef696483922052880e888747fa10afea38e))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.6
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.5](https://github.com/orochibraru/baba/compare/v1.0.4...v1.0.5) (2026-06-29)
 
 
