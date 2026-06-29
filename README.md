@@ -1,6 +1,6 @@
 # Baba
 
-> Named after the lookout pirate in the French comic book *Astérix* — always watching for trouble on the horizon.
+> Named after the lookout pirate in the French comic book *Astérix*, always watching for trouble on the horizon.
 
 Baba is a lightweight homelab monitor that sends Discord or Telegram alerts when something goes wrong — and tells you when it's fixed.
 
