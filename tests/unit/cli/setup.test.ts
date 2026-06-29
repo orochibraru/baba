@@ -1,6 +1,21 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
 import type { SetupDeps } from "../../../src/lib/cli/setup";
 import { setup } from "../../../src/lib/cli/setup";
+
+mock.module("systeminformation", () => ({
+	default: {
+		fsSize: async () => [
+			{
+				fs: "/dev/sda1",
+				used: 500_000_000_000,
+				available: 500_000_000_000,
+				size: 1_000_000_000_000,
+				use: 50,
+				mount: "/",
+			},
+		],
+	},
+}));
 
 interface MakeVolumeProps {
 	fs: string;
@@ -14,6 +29,12 @@ const makeVolume = ({ fs, size, mount }: MakeVolumeProps) => ({
 	size,
 	use: 50,
 	mount,
+});
+
+describe("setup (default deps)", () => {
+	test("exercises defaultDeps.fsSize with mocked systeminformation", async () => {
+		await expect(setup()).resolves.toBeUndefined();
+	});
 });
 
 describe("setup", () => {
