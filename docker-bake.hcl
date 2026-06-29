@@ -28,7 +28,7 @@ target "image" {
   context    = "."
   dockerfile = "./Dockerfile"
   args = {
-    APP_VERSION = "${var.TAG}"
+    APP_VERSION = "${TAG}"
   }
 }
 
