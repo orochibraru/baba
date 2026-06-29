@@ -70,8 +70,14 @@ jobs:
       - name: Test (unit)
         run: bun test --bail tests/unit --coverage-reporter=lcov
 
-      - name: Test (all, isolated)
-        run: bun test --bail --isolate --coverage-reporter=lcov
+      - name: Test (unit, isolated)
+        run: bun test --bail --isolate tests/unit --coverage-reporter=lcov
+
+      - name: Test (integration)
+        run: bun test --bail tests/integration --coverage-reporter=lcov
+
+      - name: Test (integration, isolated)
+        run: bun test --bail --isolate tests/integration --coverage-reporter=lcov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
