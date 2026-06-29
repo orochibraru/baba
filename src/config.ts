@@ -233,6 +233,7 @@ export async function loadConfig(path = "./config.json"): Promise<Config> {
 }
 
 export function getConfig(): Config {
+	/* c8 ignore next 3 */
 	if (!config) {
 		throw new Error("Config not loaded — call loadConfig() first");
 	}

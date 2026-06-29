@@ -2,7 +2,26 @@ import si from "systeminformation";
 import { humanReadableBytes } from "../helpers";
 import { logger } from "../logger";
 
-export async function setup() {
+type FsEntry = {
+	fs: string;
+	used: number;
+	available: number;
+	size: number;
+	use: number;
+	mount: string;
+};
+
+export type SetupDeps = {
+	fsSize(): Promise<FsEntry[]>;
+	exit(code: number): void;
+};
+
+const defaultDeps: SetupDeps = {
+	fsSize: () => si.fsSize(),
+	exit: process.exit,
+};
+
+export async function setup(deps: SetupDeps = defaultDeps) {
 	const readableVolumes: {
 		name: string;
 		usedBytes: string;
@@ -14,7 +33,7 @@ export async function setup() {
 	}[] = [];
 
 	logger.info("Fetching volume information...");
-	const volumes = await si.fsSize();
+	const volumes = await deps.fsSize();
 	for (const vol of volumes) {
 		readableVolumes.push({
 			name: vol.fs,
@@ -29,7 +48,8 @@ export async function setup() {
 
 	if (readableVolumes.length === 0) {
 		logger.error("No volumes found.");
-		process.exit(0);
+		deps.exit(0);
+		return;
 	}
 
 	logger.info(`Found ${readableVolumes.length} volume(s)`);
@@ -38,10 +58,9 @@ export async function setup() {
 	const sortedVolumes = readableVolumes.sort((a, b) => b.rawSize - a.rawSize);
 
 	const likelyRootVolume = sortedVolumes[0];
-	if (!likelyRootVolume) {
-		logger.error("No volumes found.");
-		process.exit(0);
-	}
+	/* c8 ignore next */
+	// biome-ignore format: single-line if needed for c8 ignore to cover unreachable guard
+	if (!likelyRootVolume) { deps.exit(0); return; }
 
 	logger.info("---");
 	logger.info("---");

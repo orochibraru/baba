@@ -2,7 +2,6 @@
 timeout = 30000
 coverage = true
 coverageThreshold = 0.95
-coverageReporter  = ["text", "lcov"]
 
 
 [run]

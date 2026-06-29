@@ -68,10 +68,15 @@ jobs:
         run: bun run lint
 
       - name: Test (unit)
-        run: bun test --bail tests/unit
+        run: bun test --bail tests/unit --coverage-reporter=lcov
 
       - name: Test (all, isolated)
-        run: bun test --bail --isolate
+        run: bun test --bail --isolate --coverage-reporter=lcov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
 
       - name: Ensure schema is up to date
         run: |
