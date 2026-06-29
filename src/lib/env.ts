@@ -47,15 +47,6 @@ export const ENV_VARS: Record<string, EnvVarDef> = {
 		default: "./tmp/baba.db",
 		example: "/data/baba.db",
 	},
-	BABA_NOTIFIERS: {
-		path: ["notifiers"],
-		type: "json",
-		description:
-			"JSON array of notifier objects. Replaces the entire `notifiers` array from `config.json`. Supports `discord` and `telegram` — see the Notifiers section below.",
-		default: "",
-		example: '[{"type":"discord","webhookUrl":"…"}]',
-	},
-
 	// ── CPU ───────────────────────────────────────────────────────────────────
 	BABA_CPU_ENABLED: {
 		path: ["checks", "cpu", "enabled"],

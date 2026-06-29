@@ -6,11 +6,12 @@
 	"private": true,
 	"scripts": {
 		"dev": "bun run --hot ./src/index.ts start",
-		"build": "bun run ./build.ts",
+		"build": "bun run ./scripts/build.ts",
 		"lint": "biome check .",
 		"lint:fix": "biome check --fix .",
 		"gen:schema": "bun run scripts/generate-schema.ts",
-		"gen:docs": "bun run scripts/generate-docs.ts",
+		"gen:docs": "bun run scripts/generate-docs.ts && biome format --write config.example.json",
+		"gen": "bun run gen:schema && bun run gen:docs",
 		"prepare": "husky",
 		"check": "tsc --noEmit --project tsconfig.json",
 		"release": "semantic-release"

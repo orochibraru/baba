@@ -46,13 +46,11 @@ describe("validate", () => {
 
 	describe("default deps (production path)", () => {
 		afterEach(() => {
-			delete process.env.BABA_NOTIFIERS;
+			delete process.env.BABA_NOTIFIERS_DISCORD_WEBHOOK_URL;
 		});
 
 		test("calls real loadConfig and real Notifiers when no deps provided", async () => {
-			process.env.BABA_NOTIFIERS = JSON.stringify([
-				{ type: "discord", webhookUrl: VALID_WEBHOOK },
-			]);
+			process.env.BABA_NOTIFIERS_DISCORD_WEBHOOK_URL = VALID_WEBHOOK;
 			// Uses defaultDeps: real loadConfig (env-var based) + real Notifiers (network fails gracefully)
 			await expect(validate()).resolves.toBeUndefined();
 		});

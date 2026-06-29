@@ -191,6 +191,40 @@ function setPath({ obj, path, value }: SetPathOpts): void {
 	cur[last] = value;
 }
 
+function applyNotifierEnvOverrides(raw: Record<string, unknown>): void {
+	const discordUrl = process.env.BABA_NOTIFIERS_DISCORD_WEBHOOK_URL;
+	const tgToken = process.env.BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN;
+	const tgChatId = process.env.BABA_NOTIFIERS_TELEGRAM_CHAT_ID;
+
+	if (!discordUrl && !tgToken && !tgChatId) return;
+
+	let notifiers: Record<string, unknown>[] = Array.isArray(raw.notifiers)
+		? (raw.notifiers as Record<string, unknown>[])
+		: [];
+
+	if (discordUrl) {
+		notifiers = notifiers.filter((n) => n.type !== "discord");
+		notifiers.push({ type: "discord", webhookUrl: discordUrl });
+		logger.debug("Env override applied: BABA_NOTIFIERS_DISCORD_WEBHOOK_URL");
+	}
+
+	if (tgToken || tgChatId) {
+		if (!tgToken || !tgChatId) {
+			logger.warn(
+				"BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN and BABA_NOTIFIERS_TELEGRAM_CHAT_ID must both be set — ignoring.",
+			);
+		} else {
+			notifiers = notifiers.filter((n) => n.type !== "telegram");
+			notifiers.push({ type: "telegram", botToken: tgToken, chatId: tgChatId });
+			logger.debug(
+				"Env override applied: BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN + BABA_NOTIFIERS_TELEGRAM_CHAT_ID",
+			);
+		}
+	}
+
+	raw.notifiers = notifiers;
+}
+
 function applyEnvOverrides(raw: Record<string, unknown>): void {
 	for (const [name, def] of Object.entries(ENV_VARS)) {
 		const val = process.env[name];
@@ -219,6 +253,7 @@ export async function loadConfig(path = "./config.json"): Promise<Config> {
 		);
 	}
 	applyEnvOverrides(raw);
+	applyNotifierEnvOverrides(raw);
 	const result = ConfigSchema.safeParse(raw);
 	if (!result.success) {
 		const issues = result.error.issues

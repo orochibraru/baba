@@ -433,15 +433,13 @@ describe("loadConfig", () => {
 	});
 
 	test("succeeds with env vars when no config file exists", async () => {
-		process.env.BABA_NOTIFIERS = JSON.stringify([
-			{ type: "discord", webhookUrl: VALID_WEBHOOK },
-		]);
+		process.env.BABA_NOTIFIERS_DISCORD_WEBHOOK_URL = VALID_WEBHOOK;
 		try {
 			const config = await loadConfig("/nonexistent/path/config.json");
 			expect(config.notifiers).toHaveLength(1);
 			expect(config.notifiers[0]?.type).toBe("discord");
 		} finally {
-			delete process.env.BABA_NOTIFIERS;
+			delete process.env.BABA_NOTIFIERS_DISCORD_WEBHOOK_URL;
 		}
 	});
 
@@ -493,20 +491,39 @@ describe("loadConfig", () => {
 			expect(config.checks.disk.volumes).toEqual(["/", "/data", "/mnt"]);
 		});
 
-		test("applies json coercion (BABA_NOTIFIERS)", async () => {
+		test("BABA_NOTIFIERS_DISCORD_WEBHOOK_URL overrides discord from config", async () => {
+			const altWebhook = "https://discord.com/api/webhooks/99/zz";
 			await Bun.write(TMP, JSON.stringify(minimal));
-			const override = [
-				{
-					type: "discord",
-					webhookUrl: "https://discord.com/api/webhooks/99/zz",
-				},
-			];
-			process.env.BABA_NOTIFIERS = JSON.stringify(override);
+			process.env.BABA_NOTIFIERS_DISCORD_WEBHOOK_URL = altWebhook;
 			const config = await loadConfig(TMP);
 			expect(config.notifiers).toHaveLength(1);
-			expect(
-				(config.notifiers[0] as { webhookUrl: string }).webhookUrl,
-			).toContain("99");
+			expect((config.notifiers[0] as { webhookUrl: string }).webhookUrl).toBe(
+				altWebhook,
+			);
+		});
+
+		test("BABA_NOTIFIERS_TELEGRAM_* adds a Telegram notifier", async () => {
+			await Bun.write(TMP, JSON.stringify(minimal));
+			process.env.BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN = "123:ABC";
+			process.env.BABA_NOTIFIERS_TELEGRAM_CHAT_ID = "-100123";
+			const config = await loadConfig(TMP);
+			// original discord + new telegram
+			expect(config.notifiers).toHaveLength(2);
+			const tg = config.notifiers.find((n) => n.type === "telegram");
+			expect(tg).toBeDefined();
+			if (tg?.type === "telegram") {
+				expect(tg.botToken).toBe("123:ABC");
+				expect(tg.chatId).toBe("-100123");
+			}
+		});
+
+		test("only one Telegram env var set is silently ignored", async () => {
+			await Bun.write(TMP, JSON.stringify(minimal));
+			process.env.BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN = "123:ABC";
+			// chat ID intentionally omitted
+			const config = await loadConfig(TMP);
+			// telegram notifier should NOT be added
+			expect(config.notifiers.every((n) => n.type !== "telegram")).toBe(true);
 		});
 
 		test("applies string coercion (BABA_MACHINE_NAME)", async () => {
@@ -514,13 +531,6 @@ describe("loadConfig", () => {
 			process.env.BABA_MACHINE_NAME = "my-server";
 			const config = await loadConfig(TMP);
 			expect(config.machineName).toBe("my-server");
-		});
-
-		test("silently ignores an invalid env var value", async () => {
-			await Bun.write(TMP, JSON.stringify(minimal));
-			process.env.BABA_NOTIFIERS = "not-valid-json{{{";
-			const config = await loadConfig(TMP);
-			expect(config.notifiers).toHaveLength(1);
 		});
 	});
 

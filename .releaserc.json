@@ -51,7 +51,53 @@
 				"npmPublish": false
 			}
 		],
-		"@semantic-release/github",
+		[
+			"@semantic-release/github",
+			{
+				"assets": [
+					{
+						"path": "dist/bun-linux-x64",
+						"name": "baba-linux-x64",
+						"label": "Linux x64"
+					},
+					{
+						"path": "dist/bun-linux-arm64",
+						"name": "baba-linux-arm64",
+						"label": "Linux ARM64"
+					},
+					{
+						"path": "dist/bun-darwin-x64",
+						"name": "baba-darwin-x64",
+						"label": "macOS Intel (x64)"
+					},
+					{
+						"path": "dist/bun-darwin-arm64",
+						"name": "baba-darwin-arm64",
+						"label": "macOS Apple Silicon (arm64)"
+					},
+					{
+						"path": "dist/bun-windows-x64.exe",
+						"name": "baba-windows-x64.exe",
+						"label": "Windows x64"
+					},
+					{
+						"path": "dist/bun-windows-arm64.exe",
+						"name": "baba-windows-arm64.exe",
+						"label": "Windows ARM64"
+					},
+					{
+						"path": "install.sh",
+						"name": "install.sh",
+						"label": "Install Script (Linux / macOS)"
+					},
+					{
+						"path": "config.example.json",
+						"name": "config.example.json",
+						"label": "Example Configuration"
+					}
+				]
+			}
+		],
 		[
 			"@semantic-release/git",
 			{

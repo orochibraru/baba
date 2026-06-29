@@ -31,28 +31,39 @@ const envRows = Object.entries(ENV_VARS).map(([name, def]) =>
 
 const notifiersSectionEnv = `## Notifiers
 
-\`BABA_NOTIFIERS\` must be a valid JSON array. Each element needs a \`"type"\` field. You can mix types freely.
+Configure notifiers with individual environment variables — no JSON required. Each notifier type is independent; set whichever you need.
 
-**Discord**:
+**Discord**
 
-\`\`\`sh
-BABA_NOTIFIERS='[{"type":"discord","webhookUrl":"https://discord.com/api/webhooks/<id>/<token>"}]'
+| Variable | Description | Example |
+|----------|-------------|---------|
+| \`BABA_NOTIFIERS_DISCORD_WEBHOOK_URL\` | Webhook URL. When set, replaces any Discord notifier from \`config.json\`. | \`https://discord.com/api/webhooks/<id>/<token>\` |
+
+\`\`\`bash
+BABA_NOTIFIERS_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/<id>/<token>
 \`\`\`
 
-**Telegram**:
+**Telegram** — both variables must be set together
 
-\`\`\`sh
-BABA_NOTIFIERS='[{"type":"telegram","botToken":"123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","chatId":"-1001234567890"}]'
+| Variable | Description | Example |
+|----------|-------------|---------|
+| \`BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN\` | Token from @BotFather on Telegram. | \`123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\` |
+| \`BABA_NOTIFIERS_TELEGRAM_CHAT_ID\` | Target chat, group ID (prefixed with \`-\`), or \`@channelname\`. | \`-1001234567890\` |
+
+\`\`\`bash
+BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN=123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+BABA_NOTIFIERS_TELEGRAM_CHAT_ID=-1001234567890
 \`\`\`
 
-**Multiple notifiers**:
+**Both notifiers active at the same time**:
 
-\`\`\`sh
-BABA_NOTIFIERS='[
-  {"type":"discord","webhookUrl":"https://discord.com/api/webhooks/<id>/<token>"},
-  {"type":"telegram","botToken":"123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","chatId":"-1001234567890"}
-]'
+\`\`\`bash
+BABA_NOTIFIERS_DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/<id>/<token>"
+BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN="123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+BABA_NOTIFIERS_TELEGRAM_CHAT_ID="-1001234567890"
 \`\`\`
+
+Env var notifiers override any notifier of the same type from \`config.json\` while leaving other types in place. If only one of the Telegram pair is set, both are ignored with a warning.
 `;
 
 const envMd = `# Environment Variables
@@ -241,8 +252,30 @@ ${notifiersSectionConfig}
 See \`config.example.json\` in the repository root.
 `;
 
+// ── config.example.json ───────────────────────────────────────────────────────
+
+const exampleConfig = ConfigSchema.parse({
+	$schema: "./schema/config.schema.json",
+	machineName: "my-server",
+	notifiers: [
+		{
+			type: "discord",
+			webhookUrl: "https://discord.com/api/webhooks/<id>/<token>",
+		},
+		{
+			type: "telegram",
+			botToken: "123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+			chatId: "-1001234567890",
+		},
+	],
+});
+
 // ── write ─────────────────────────────────────────────────────────────────────
 
 await Bun.write("docs/env.md", envMd);
 await Bun.write("docs/config.md", configMd);
-logger.info("Generated docs/env.md and docs/config.md");
+await Bun.write(
+	"config.example.json",
+	`${JSON.stringify(exampleConfig, null, "\t")}\n`,
+);
+logger.info("Generated docs/env.md, docs/config.md, and config.example.json");

@@ -10,7 +10,6 @@ Values are applied **before** Zod validation, so type coercion and defaults stil
 | `BABA_INTERVAL_SECONDS` | number | `60` | `30` | Seconds between monitor check cycles. |
 | `BABA_REMINDER_INTERVAL_MINUTES` | number | `30` | `60` | Minutes before re-alerting for an ongoing incident. |
 | `BABA_DATABASE_PATH` | string | `./tmp/baba.db` | `/data/baba.db` | Path to the SQLite incident database. |
-| `BABA_NOTIFIERS` | json | — | `[{"type":"discord","webhookUrl":"…"}]` | JSON array of notifier objects. Replaces the entire `notifiers` array from `config.json`. Supports `discord` and `telegram` — see the Notifiers section below. |
 | `BABA_CPU_ENABLED` | boolean | `true` | — | Enable CPU usage monitoring. |
 | `BABA_CPU_THRESHOLD` | number | `90` | `80` | CPU usage % that triggers an alert. |
 | `BABA_CPU_CONSECUTIVE_BREACHES` | number | `3` | — | Consecutive high readings before opening a CPU incident. |
@@ -33,28 +32,39 @@ Values are applied **before** Zod validation, so type coercion and defaults stil
 
 ## Notifiers
 
-`BABA_NOTIFIERS` must be a valid JSON array. Each element needs a `"type"` field. You can mix types freely.
+Configure notifiers with individual environment variables — no JSON required. Each notifier type is independent; set whichever you need.
 
-**Discord**:
+**Discord**
 
-```sh
-BABA_NOTIFIERS='[{"type":"discord","webhookUrl":"https://discord.com/api/webhooks/<id>/<token>"}]'
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `BABA_NOTIFIERS_DISCORD_WEBHOOK_URL` | Webhook URL. When set, replaces any Discord notifier from `config.json`. | `https://discord.com/api/webhooks/<id>/<token>` |
+
+```bash
+BABA_NOTIFIERS_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/<id>/<token>
 ```
 
-**Telegram**:
+**Telegram** — both variables must be set together
 
-```sh
-BABA_NOTIFIERS='[{"type":"telegram","botToken":"123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","chatId":"-1001234567890"}]'
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN` | Token from @BotFather on Telegram. | `123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| `BABA_NOTIFIERS_TELEGRAM_CHAT_ID` | Target chat, group ID (prefixed with `-`), or `@channelname`. | `-1001234567890` |
+
+```bash
+BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN=123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+BABA_NOTIFIERS_TELEGRAM_CHAT_ID=-1001234567890
 ```
 
-**Multiple notifiers**:
+**Both notifiers active at the same time**:
 
-```sh
-BABA_NOTIFIERS='[
-  {"type":"discord","webhookUrl":"https://discord.com/api/webhooks/<id>/<token>"},
-  {"type":"telegram","botToken":"123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","chatId":"-1001234567890"}
-]'
+```bash
+BABA_NOTIFIERS_DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/<id>/<token>"
+BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN="123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+BABA_NOTIFIERS_TELEGRAM_CHAT_ID="-1001234567890"
 ```
+
+Env var notifiers override any notifier of the same type from `config.json` while leaving other types in place. If only one of the Telegram pair is set, both are ignored with a warning.
 
 ## Types
 

@@ -1,13 +1,33 @@
 {
-	"$schema": "https://raw.githubusercontent.com/orochibraru/baba/refs/heads/main/schema/config.schema.json",
+	"$schema": "./schema/config.schema.json",
+	"machineName": "my-server",
+	"logLevel": "info",
 	"intervalSeconds": 60,
 	"reminderIntervalMinutes": 30,
-	"machineName": "My Server",
-	"logLevel": "info",
 	"database": {
 		"path": "./tmp/baba.db"
 	},
 	"checks": {
+		"cpu": {
+			"enabled": true,
+			"usageThresholdPercent": 90,
+			"consecutiveBreaches": 3
+		},
+		"load": {
+			"enabled": true,
+			"threshold": 8,
+			"consecutiveBreaches": 3
+		},
+		"memory": {
+			"enabled": true,
+			"usageThresholdPercent": 90,
+			"consecutiveBreaches": 3
+		},
+		"disk": {
+			"enabled": true,
+			"usageThresholdPercent": 90,
+			"volumes": ["/"]
+		},
 		"temperature": {
 			"enabled": false,
 			"cpuThresholdCelsius": 85,
@@ -18,37 +38,17 @@
 			"enabled": false,
 			"vramThresholdPercent": 90,
 			"consecutiveBreaches": 3
-		},
-		"cpu": {
-			"enabled": true,
-			"usageThresholdPercent": 90,
-			"consecutiveBreaches": 3
-		},
-		"load": {
-			"enabled": true,
-			"consecutiveBreaches": 3,
-			"threshold": 8.0
-		},
-		"memory": {
-			"enabled": true,
-			"consecutiveBreaches": 3,
-			"usageThresholdPercent": 90
-		},
-		"disk": {
-			"enabled": true,
-			"usageThresholdPercent": 90,
-			"volumes": ["/dev/sda"]
 		}
 	},
 	"notifiers": [
 		{
 			"type": "discord",
-			"webhookUrl": "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+			"webhookUrl": "https://discord.com/api/webhooks/<id>/<token>"
 		},
 		{
 			"type": "telegram",
-			"botToken": "YOUR_BOT_TOKEN",
-			"chatId": "YOUR_CHAT_ID"
+			"botToken": "123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+			"chatId": "-1001234567890"
 		}
 	]
 }

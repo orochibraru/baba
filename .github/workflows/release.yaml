@@ -38,6 +38,15 @@ jobs:
           token: ${{ secrets.CI_TOKEN }}
           fetch-depth: 0
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build binaries
+        run: bun run build
+
       - name: Semantic Release
         id: semantic # We need this ID to grab the version output in the next steps
         uses: cycjimmy/semantic-release-action@v6
