@@ -2,6 +2,8 @@ import { z } from "zod";
 import { ConfigSchema } from "../src/config";
 import { ENV_VARS } from "../src/lib/env";
 import { logger } from "../src/lib/logger";
+import { discordNotifierSchema } from "../src/lib/notifiers/discord";
+import { telegramNotifierSchema } from "../src/lib/notifiers/telegram";
 
 logger.info("Generating docs...");
 
@@ -27,6 +29,32 @@ const envRows = Object.entries(ENV_VARS).map(([name, def]) =>
 	),
 );
 
+const notifiersSectionEnv = `## Notifiers
+
+\`BABA_NOTIFIERS\` must be a valid JSON array. Each element needs a \`"type"\` field. You can mix types freely.
+
+**Discord**:
+
+\`\`\`sh
+BABA_NOTIFIERS='[{"type":"discord","webhookUrl":"https://discord.com/api/webhooks/<id>/<token>"}]'
+\`\`\`
+
+**Telegram**:
+
+\`\`\`sh
+BABA_NOTIFIERS='[{"type":"telegram","botToken":"123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","chatId":"-1001234567890"}]'
+\`\`\`
+
+**Multiple notifiers**:
+
+\`\`\`sh
+BABA_NOTIFIERS='[
+  {"type":"discord","webhookUrl":"https://discord.com/api/webhooks/<id>/<token>"},
+  {"type":"telegram","botToken":"123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","chatId":"-1001234567890"}
+]'
+\`\`\`
+`;
+
 const envMd = `# Environment Variables
 
 Every setting in \`config.json\` can be overridden with an environment variable.
@@ -36,6 +64,7 @@ Values are applied **before** Zod validation, so type coercion and defaults stil
 |----------|------|---------|---------|-------------|
 ${envRows.join("\n")}
 
+${notifiersSectionEnv}
 ## Types
 
 | Type | Parsing |
@@ -55,6 +84,7 @@ type JsonSchema = {
 	items?: JsonSchema;
 	default?: unknown;
 	enum?: unknown[];
+	const?: unknown;
 	description?: string;
 	anyOf?: JsonSchema[];
 	oneOf?: JsonSchema[];
@@ -62,6 +92,7 @@ type JsonSchema = {
 };
 
 function schemaType(s: JsonSchema): string {
+	if (s.const !== undefined) return fence(String(s.const));
 	if (s.enum) return s.enum.map((v) => `\`${v}\``).join(" \\| ");
 	if (s.anyOf) return s.anyOf.map(schemaType).join(" \\| ");
 	if (s.oneOf) return s.oneOf.map(schemaType).join(" \\| ");
@@ -77,6 +108,11 @@ function schemaDefault(s: JsonSchema): string {
 	return fence(String(v));
 }
 
+// Build a path → description map from ENV_VARS so config table rows get descriptions.
+const envDesc = new Map<string, string>(
+	Object.values(ENV_VARS).map((def) => [def.path.join("."), def.description]),
+);
+
 function flattenProperties(
 	props: Record<string, JsonSchema>,
 	prefix = "",
@@ -84,21 +120,84 @@ function flattenProperties(
 	const lines: string[] = [];
 	for (const [key, schema] of Object.entries(props)) {
 		const path = prefix ? `${prefix}.${key}` : key;
-		if (schema.properties) {
-			lines.push(...flattenProperties(schema.properties, path));
-		} else {
+
+		// notifiers is a discriminated union array — render a single summary row
+		// and let the Notifiers section below the table document the fields.
+		if (path === "notifiers") {
 			lines.push(
 				row(
 					`\`${path}\``,
-					schemaType(schema),
-					schemaDefault(schema),
-					schema.description ?? "—",
+					"NotifierConfig[]",
+					"**required**",
+					"One or more notification destinations. See [Notifiers](#notifiers) below.",
 				),
+			);
+			continue;
+		}
+
+		if (schema.properties) {
+			lines.push(...flattenProperties(schema.properties, path));
+		} else {
+			const desc = schema.description ?? envDesc.get(path) ?? "—";
+			lines.push(
+				row(`\`${path}\``, schemaType(schema), schemaDefault(schema), desc),
 			);
 		}
 	}
 	return lines;
 }
+
+// Generate a field table for a single notifier schema.
+function notifierFieldTable(schema: z.ZodType): string {
+	const js = z.toJSONSchema(schema, {
+		target: "draft-7",
+		unrepresentable: "any",
+	}) as JsonSchema;
+	if (!js.properties) return "";
+	const rows = Object.entries(js.properties).map(([field, fieldSchema]) => {
+		const s = fieldSchema as JsonSchema;
+		return row(`\`${field}\``, schemaType(s), s.description ?? "—");
+	});
+	return [
+		"| Field | Type | Description |",
+		"|-------|------|-------------|",
+		...rows,
+	].join("\n");
+}
+
+const notifiersSectionConfig = `## Notifiers
+
+\`notifiers\` is a required array. Each entry must have a \`"type"\` field that selects the notifier. You can list multiple destinations of different types.
+
+### Discord
+
+Sends alerts to a Discord channel via an incoming webhook.
+
+${notifierFieldTable(discordNotifierSchema)}
+
+\`\`\`json
+{
+  "type": "discord",
+  "webhookUrl": "https://discord.com/api/webhooks/<id>/<token>"
+}
+\`\`\`
+
+### Telegram
+
+Sends alerts to a Telegram chat, group, or channel via a bot.
+
+${notifierFieldTable(telegramNotifierSchema)}
+
+\`\`\`json
+{
+  "type": "telegram",
+  "botToken": "123456789:AAFxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "chatId": "-1001234567890"
+}
+\`\`\`
+
+To find your Telegram chat ID: add [@userinfobot](https://t.me/userinfobot) to the chat, or forward a message from the chat to it.
+`;
 
 const jsonSchema = z.toJSONSchema(ConfigSchema, {
 	target: "draft-7",
@@ -125,13 +224,14 @@ Every field is optional (defaults are applied) except \`notifiers\`.
 |-----|------|---------|-------------|
 ${configRows.join("\n")}
 
+${notifiersSectionConfig}
 ## Minimal \`config.json\`
 
 \`\`\`json
 {
   "$schema": "./schema/config.schema.json",
   "notifiers": [
-    { "type": "discord", "webhookUrl": "https://discord.com/api/webhooks/…" }
+    { "type": "discord", "webhookUrl": "https://discord.com/api/webhooks/<id>/<token>" }
   ]
 }
 \`\`\`

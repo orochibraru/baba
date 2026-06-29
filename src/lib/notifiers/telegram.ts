@@ -7,15 +7,16 @@ export const telegramNotifierSchema = z
 		type: z.literal("telegram", { error: "Must be 'telegram'" }),
 		botToken: z
 			.string({ error: "Must be a string" })
-			.min(
-				1,
-				"Bot token cannot be empty — get one from @BotFather on Telegram",
-			),
+			.min(1, "Bot token cannot be empty — get one from @BotFather on Telegram")
+			.describe("Token from @BotFather on Telegram."),
 		chatId: z
 			.string({ error: "Must be a string" })
 			.min(
 				1,
 				"Chat ID cannot be empty — use a user ID, group ID (prefixed with -), or @channelname",
+			)
+			.describe(
+				"Target chat. Use a user ID, a group ID (prefixed with `-`), or `@channelname`.",
 			),
 	})
 	.strict();

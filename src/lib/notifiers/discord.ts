@@ -5,9 +5,13 @@ import { AbstractNotifier } from "./abstract-notifier";
 export const discordNotifierSchema = z
 	.object({
 		type: z.literal("discord", { error: "Must be 'discord'" }),
-		webhookUrl: z.url(
-			'Must be a valid Discord webhook URL (e.g. "https://discord.com/api/webhooks/<id>/<token>")',
-		),
+		webhookUrl: z
+			.url(
+				'Must be a valid Discord webhook URL (e.g. "https://discord.com/api/webhooks/<id>/<token>")',
+			)
+			.describe(
+				"Webhook URL from Discord → Channel Settings → Integrations → Webhooks.",
+			),
 	})
 	.strict();
 

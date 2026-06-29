@@ -51,10 +51,9 @@ export const ENV_VARS: Record<string, EnvVarDef> = {
 		path: ["notifiers"],
 		type: "json",
 		description:
-			"Full notifiers config as a JSON array. Overrides the `notifiers` key in config.json.",
+			"JSON array of notifier objects. Replaces the entire `notifiers` array from `config.json`. Supports `discord` and `telegram` — see the Notifiers section below.",
 		default: "",
-		example:
-			'[{"type":"discord","webhookUrl":"https://discord.com/api/webhooks/…"}]',
+		example: '[{"type":"discord","webhookUrl":"…"}]',
 	},
 
 	// ── CPU ───────────────────────────────────────────────────────────────────

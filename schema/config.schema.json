@@ -313,7 +313,8 @@
               },
               "webhookUrl": {
                 "type": "string",
-                "format": "uri"
+                "format": "uri",
+                "description": "Webhook URL from Discord → Channel Settings → Integrations → Webhooks."
               }
             },
             "required": [
@@ -331,11 +332,13 @@
               },
               "botToken": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "description": "Token from @BotFather on Telegram."
               },
               "chatId": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "description": "Target chat. Use a user ID, a group ID (prefixed with `-`), or `@channelname`."
               }
             },
             "required": [

@@ -44,6 +44,11 @@
 		{
 			"type": "discord",
 			"webhookUrl": "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+		},
+		{
+			"type": "telegram",
+			"botToken": "YOUR_BOT_TOKEN",
+			"chatId": "YOUR_CHAT_ID"
 		}
 	]
 }
