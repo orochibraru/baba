@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { unlink } from "node:fs/promises";
-import { ConfigSchema, loadConfig } from "../../src/config";
+import {
+	ConfigSchema,
+	getConfig,
+	isConfigLoaded,
+	loadConfig,
+} from "../../src/config";
 
 const VALID_WEBHOOK =
 	"https://discord.com/api/webhooks/123456789/abcdefghijklmno";
@@ -504,6 +509,13 @@ describe("loadConfig", () => {
 			).toContain("99");
 		});
 
+		test("applies string coercion (BABA_MACHINE_NAME)", async () => {
+			await Bun.write(TMP, JSON.stringify(minimal));
+			process.env.BABA_MACHINE_NAME = "my-server";
+			const config = await loadConfig(TMP);
+			expect(config.machineName).toBe("my-server");
+		});
+
 		test("silently ignores an invalid env var value", async () => {
 			await Bun.write(TMP, JSON.stringify(minimal));
 			process.env.BABA_NOTIFIERS = "not-valid-json{{{";
@@ -521,5 +533,17 @@ describe("loadConfig", () => {
 		);
 		expect(loadConfig(TMP)).rejects.toThrow("Unknown notifier type");
 		expect(loadConfig(TMP)).rejects.toThrow("nonexistent");
+	});
+
+	test("isConfigLoaded returns true after a successful load", async () => {
+		await Bun.write(TMP, JSON.stringify(minimal));
+		await loadConfig(TMP);
+		expect(isConfigLoaded()).toBe(true);
+	});
+
+	test("getConfig returns an object after loading", async () => {
+		await Bun.write(TMP, JSON.stringify(minimal));
+		await loadConfig(TMP);
+		expect(typeof getConfig()).toBe("object");
 	});
 });

@@ -3,8 +3,13 @@ import { formatDate } from "../helpers";
 import { IncidentStore } from "../incident-store";
 import { logger } from "../logger";
 
-export async function listIncidents(opts: { limit: string }) {
-	const store = new IncidentStore();
+type ListStore = Pick<IncidentStore, "listIncidents">;
+type GetStore = Pick<IncidentStore, "getIncident">;
+
+export async function listIncidents(
+	opts: { limit: string },
+	store: ListStore = new IncidentStore(),
+) {
 	const incidents = store.listIncidents(Number(opts.limit));
 
 	if (incidents.length === 0) {
@@ -37,13 +42,21 @@ export async function listIncidents(opts: { limit: string }) {
 	}
 }
 
-export async function getIncident(id: string) {
-	const store = new IncidentStore();
-	const incident = store.getIncident(Number(id));
+interface GetIncidentProps {
+	store: GetStore;
+	exit: (code: number) => void;
+}
+
+export async function getIncident(
+	id: string,
+	props: GetIncidentProps = { store: new IncidentStore(), exit: process.exit },
+) {
+	const incident = props.store.getIncident(Number(id));
 
 	if (!incident) {
 		logger.error(`Incident #${id} not found.`);
-		process.exit(1);
+		props.exit(1);
+		return;
 	}
 
 	const status = incident.resolved_at ? "RESOLVED" : "OPEN";

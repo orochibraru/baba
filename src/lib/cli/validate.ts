@@ -1,11 +1,22 @@
+import type { Config } from "../../config";
 import { loadConfig } from "../../config";
 import { logger } from "../logger";
 import { Notifiers } from "../notifiers";
 
-export async function validate() {
-	await loadConfig();
+export type ValidateDeps = {
+	loadConfig(): Promise<Config>;
+	createNotifiers(): { alert(msg: string): Promise<void> };
+};
+
+const defaultDeps: ValidateDeps = {
+	loadConfig: () => loadConfig(),
+	createNotifiers: () => new Notifiers(),
+};
+
+export async function validate(deps: ValidateDeps = defaultDeps) {
+	await deps.loadConfig();
 	try {
-		const notifiers = new Notifiers();
+		const notifiers = deps.createNotifiers();
 		await notifiers.alert("This is a test alert.");
 		logger.info("Test alert sent successfully.");
 	} catch (error) {

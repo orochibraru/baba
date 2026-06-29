@@ -2,18 +2,41 @@
 import { Database } from "bun:sqlite";
 import { existsSync } from "node:fs";
 import si from "systeminformation";
+import type { Config } from "../../config";
 import { loadConfig } from "../../config";
 import { setLogLevel } from "../logger";
 
 type CheckResult = { name: string; ok: boolean; detail?: string };
 
-async function runChecks(configPath: string): Promise<CheckResult[]> {
+type DatabaseLike = {
+	query(sql: string): { get(): unknown };
+	close(): void;
+};
+
+export type HealthDeps = {
+	loadConfig(path: string): Promise<Config>;
+	existsSync(path: string): boolean;
+	createDb(path: string): DatabaseLike;
+	siMem(): Promise<{ total: number }>;
+};
+
+const defaultDeps: HealthDeps = {
+	loadConfig,
+	existsSync,
+	createDb: (path) => new Database(path, { readonly: true }),
+	siMem: () => si.mem(),
+};
+
+export async function runChecks(
+	configPath: string,
+	deps: HealthDeps = defaultDeps,
+): Promise<CheckResult[]> {
 	const results: CheckResult[] = [];
 
 	// 1. Config is valid and has at least one notifier configured
 	let dbPath = "./tmp/baba.db";
 	try {
-		const config = await loadConfig(configPath);
+		const config = await deps.loadConfig(configPath);
 		dbPath = config.database.path;
 		results.push({ name: "config", ok: true });
 	} catch (err) {
@@ -22,12 +45,12 @@ async function runChecks(configPath: string): Promise<CheckResult[]> {
 
 	// 2. Database is accessible and the schema is initialised
 	try {
-		if (!existsSync(dbPath)) {
+		if (!deps.existsSync(dbPath)) {
 			throw new Error(
 				`not found at "${dbPath}" — has the service started at least once?`,
 			);
 		}
-		const db = new Database(dbPath, { readonly: true });
+		const db = deps.createDb(dbPath);
 		db.query("SELECT COUNT(*) FROM incidents").get();
 		db.close();
 		results.push({ name: "database", ok: true });
@@ -37,7 +60,7 @@ async function runChecks(configPath: string): Promise<CheckResult[]> {
 
 	// 3. Host system metrics are readable (validates --pid=host and /proc access)
 	try {
-		const mem = await si.mem();
+		const mem = await deps.siMem();
 		if (!mem.total) throw new Error("mem.total is 0 — is --pid=host set?");
 		results.push({ name: "system", ok: true });
 	} catch (err) {
@@ -47,10 +70,18 @@ async function runChecks(configPath: string): Promise<CheckResult[]> {
 	return results;
 }
 
-export async function health(configPath: string): Promise<void> {
+interface HealthProps {
+	exit: (code: number) => void;
+	deps: HealthDeps;
+}
+
+export async function health(
+	configPath: string,
+	props: HealthProps = { exit: process.exit, deps: defaultDeps },
+): Promise<void> {
 	setLogLevel("error");
 
-	const results = await runChecks(configPath);
+	const results = await runChecks(configPath, props.deps);
 	const allOk = results.every((r) => r.ok);
 
 	for (const r of results) {
@@ -58,5 +89,5 @@ export async function health(configPath: string): Promise<void> {
 		(r.ok ? console.log : console.error)(`${r.ok ? "✓" : "✗"} ${line}`);
 	}
 
-	process.exit(allOk ? 0 : 1);
+	props.exit(allOk ? 0 : 1);
 }
