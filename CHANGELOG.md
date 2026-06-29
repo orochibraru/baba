@@ -1,3 +1,26 @@
+## [1.0.3](https://github.com/orochibraru/baba/compare/v1.0.2...v1.0.3) (2026-06-29)
+
+
+### Bug Fixes
+
+* can run without a config file ([4732d33](https://github.com/orochibraru/baba/commit/4732d332fc0afa088345cacb4a7b3842960debde))
+* test confg ([#2](https://github.com/orochibraru/baba/issues/2)) ([a575be4](https://github.com/orochibraru/baba/commit/a575be470024ef68ade222f7087d05000657a040))
+
+
+### Features
+
+* healthcheck & example + contributing ([600e421](https://github.com/orochibraru/baba/commit/600e42199409fab2a76acbfac1e8753db5e30a75))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.3
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.2](https://github.com/orochibraru/baba/compare/v1.0.1...v1.0.2) (2026-06-29)
 
 
