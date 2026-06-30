@@ -23,9 +23,11 @@ export class DiskCheck extends BaseCheck {
 
 		let total = 0;
 		for (const vol of selected) {
-			// Use size - available rather than vol.used so APFS shared-pool
-			// space is counted correctly (vol.used only reflects one subvolume).
-			const consumed = vol.size - vol.available;
+			// Prefer size - available (APFS shared-pool awareness; vol.used only
+			// reflects one subvolume). Fall back to vol.used when available is absent.
+			const consumed = Number.isFinite(vol.available)
+				? vol.size - vol.available
+				: vol.used;
 			const usage = Math.round((consumed / vol.size) * 100);
 			logger.debug(
 				`Disk ${vol.fs}: ${usage}% (${humanReadableBytes(consumed)} / ${humanReadableBytes(vol.size)})`,

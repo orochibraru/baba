@@ -10,7 +10,7 @@ import type {
 const GB = 1024 ** 3;
 
 let cpuLoadData = { currentLoad: 50, avgLoad: 2.5 };
-let memData = { total: 16 * GB, used: 8 * GB };
+let memData = { total: 16 * GB, used: 8 * GB, available: 8 * GB };
 let diskData: Systeminformation.FsSizeData[] = [];
 let cpuTempData = {
 	main: null as number | null,
@@ -97,7 +97,7 @@ let monitor: Monitor;
 
 beforeEach(async () => {
 	cpuLoadData = { currentLoad: 50, avgLoad: 2.5 };
-	memData = { total: 16 * GB, used: 8 * GB };
+	memData = { total: 16 * GB, used: 8 * GB, available: 8 * GB };
 	diskData = [];
 	cpuTempData = { main: null, max: null, cores: [], socket: [], chipset: null };
 	graphicsData = { controllers: [] };
@@ -116,6 +116,7 @@ describe("Monitor.runAllParallel", () => {
 			{
 				fs: "/",
 				used: 50 * GB,
+				available: 50 * GB,
 				size: 100 * GB,
 			} as unknown as Systeminformation.FsSizeData,
 		];
@@ -138,6 +139,7 @@ describe("Monitor.runAllParallel", () => {
 			{
 				fs: "/",
 				used: 50 * GB,
+				available: 50 * GB,
 				size: 100 * GB,
 			} as unknown as Systeminformation.FsSizeData,
 		];
@@ -148,7 +150,7 @@ describe("Monitor.runAllParallel", () => {
 		const statusLine = loggerSpy.mock.calls
 			.map((args) => String(args[0]))
 			.find((line) => line.includes("CPU:"));
-		expect(statusLine).toContain("Temp: N/A");
+		expect(statusLine).not.toContain("Temp:");
 		expect(statusLine).not.toContain("GPU:");
 		loggerSpy.mockRestore();
 	});

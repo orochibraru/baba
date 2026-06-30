@@ -15,9 +15,11 @@ export class MemoryCheck extends BaseCheck {
 	async run(): Promise<string | undefined> {
 		if (!this.cfg.enabled) return;
 		const mem = await si.mem();
-		// Use total - available rather than mem.used so page cache and buffers
-		// are excluded, matching what htop/btop report as "used".
-		const actualUsed = mem.total - mem.available;
+		// Prefer total - available (excludes page cache/buffers, matches htop/btop).
+		// Fall back to mem.used when available is absent (e.g. some container runtimes).
+		const actualUsed = Number.isFinite(mem.available)
+			? mem.total - mem.available
+			: mem.used;
 		const usage = Math.round((actualUsed / mem.total) * 100);
 		logger.debug(
 			`Memory: ${usage}% (${humanReadableBytes(actualUsed)} / ${humanReadableBytes(mem.total)})`,
