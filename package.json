@@ -2,7 +2,7 @@
 	"name": "@orochibraru/baba",
 	"module": "index.ts",
 	"type": "module",
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"private": true,
 	"scripts": {
 		"dev": "DEFAULT_CONFIG_TEMPLATE=./config.example.json DEFAULT_CONFIG_PATH=./config.json BABA_CONFIG_PATH=./config.json bun run --hot ./src/index.ts start",

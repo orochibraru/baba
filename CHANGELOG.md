@@ -1,3 +1,20 @@
+## [1.0.11](https://github.com/orochibraru/baba/compare/v1.0.10...v1.0.11) (2026-06-30)
+
+
+### Bug Fixes
+
+* public methods ([120edd3](https://github.com/orochibraru/baba/commit/120edd36f85dd1f26ab187646e6554831a9a2518))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.11
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.10](https://github.com/orochibraru/baba/compare/v1.0.9...v1.0.10) (2026-06-30)
 
 
