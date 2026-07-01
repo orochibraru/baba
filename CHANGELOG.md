@@ -1,3 +1,20 @@
+## [1.0.12](https://github.com/orochibraru/baba/compare/v1.0.11...v1.0.12) (2026-07-01)
+
+
+### Bug Fixes
+
+* semantic release packages ([285a0fc](https://github.com/orochibraru/baba/commit/285a0fcbcaf99c1410266c3359f3acd94b0e9129))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.12
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.11](https://github.com/orochibraru/baba/compare/v1.0.10...v1.0.11) (2026-06-30)
 
 
