@@ -12,11 +12,15 @@ export class CpuCheck extends BaseCheck {
 	}
 
 	async run(): Promise<string | undefined> {
-		if (!this.cfg.enabled) return;
+		if (!this.cfg.enabled) {
+			return;
+		}
+
 		const data = await si.currentLoad();
 		const usage = Math.round(data.currentLoad);
 		logger.debug(`CPU usage: ${usage}%`);
-		await this.breach({
+
+		await this.checkIfBreachedAndAlert({
 			metric: "cpu",
 			volume: null,
 			value: usage,

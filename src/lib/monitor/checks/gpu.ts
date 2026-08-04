@@ -40,7 +40,9 @@ export class GpuCheck extends BaseCheck {
 	}
 
 	async run(): Promise<string | undefined> {
-		if (!this.cfg.enabled) return;
+		if (!this.cfg.enabled) {
+			return;
+		}
 		const graphics = await si.graphics();
 		const parts: string[] = [];
 		let smiData: Map<number, number> | null = null;
@@ -57,13 +59,17 @@ export class GpuCheck extends BaseCheck {
 			) {
 				vram = Math.round((ctrl.memoryUsed / ctrl.memoryTotal) * 100);
 			} else {
-				if (!smiData) smiData = await nvidiaSmiVram();
+				if (!smiData) {
+					smiData = await nvidiaSmiVram();
+				}
 				vram = smiData.get(i) ?? null;
 			}
 
-			if (vram == null) continue;
+			if (vram == null) {
+				continue;
+			}
 			logger.debug(`GPU VRAM (${ctrl.name}): ${vram}%`);
-			await this.breach({
+			await this.checkIfBreachedAndAlert({
 				metric: `gpu:${ctrl.name}`,
 				volume: null,
 				value: vram,
@@ -76,7 +82,9 @@ export class GpuCheck extends BaseCheck {
 			parts.push(`${ctrl.name}: ${vram}%`);
 		}
 
-		if (parts.length === 0) return "GPU: N/A";
+		if (parts.length === 0) {
+			return "GPU: N/A";
+		}
 		return `GPU: ${parts.join(" | ")}`;
 	}
 }

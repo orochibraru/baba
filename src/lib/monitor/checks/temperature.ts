@@ -12,7 +12,9 @@ export class TemperatureCheck extends BaseCheck {
 	}
 
 	async run(): Promise<string | undefined> {
-		if (!this.cfg.enabled) return;
+		if (!this.cfg.enabled) {
+			return;
+		}
 		const [cpuTemp, graphics] = await Promise.all([
 			si.cpuTemperature(),
 			si.graphics(),
@@ -23,7 +25,7 @@ export class TemperatureCheck extends BaseCheck {
 		const cpuMax = this.resolveCpuTemp(cpuTemp);
 		if (cpuMax != null) {
 			logger.debug(`CPU temp: ${cpuMax}°C`);
-			await this.breach({
+			await this.checkIfBreachedAndAlert({
 				metric: "temp:cpu",
 				volume: null,
 				value: cpuMax,
@@ -40,7 +42,7 @@ export class TemperatureCheck extends BaseCheck {
 			const gpuTemp = ctrl.temperatureGpu;
 			if (gpuTemp != null && gpuTemp > 0) {
 				logger.debug(`GPU temp (${ctrl.name}): ${gpuTemp}°C`);
-				await this.breach({
+				await this.checkIfBreachedAndAlert({
 					metric: `temp:gpu:${ctrl.name}`,
 					volume: null,
 					value: gpuTemp,
@@ -55,7 +57,9 @@ export class TemperatureCheck extends BaseCheck {
 		}
 
 		// No readings available (e.g. macOS, or hardware without sensor access) — suppress status line
-		if (parts.length === 0) return undefined;
+		if (parts.length === 0) {
+			return undefined;
+		}
 		return `Temp: ${parts.join(" | ")}`;
 	}
 

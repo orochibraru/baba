@@ -27,7 +27,9 @@ const defaultDeps: LogsDeps = {
 	},
 	readFile: async (path) => {
 		const f = Bun.file(path);
-		if (!(await f.exists())) return null;
+		if (!(await f.exists())) {
+			return null;
+		}
 		return f.text();
 	},
 	getFileSize: async (path) => (await stat(path)).size,
@@ -89,7 +91,9 @@ export async function runLogs(
 		process.stdout.write(`${formatLine(line)}\n`);
 	}
 
-	if (!opts.follow) return;
+	if (!opts.follow) {
+		return;
+	}
 
 	let position = await deps.getFileSize(logPath);
 	let partial = "";
@@ -97,7 +101,9 @@ export async function runLogs(
 	while (true) {
 		await deps.sleep(200);
 		const size = await deps.getFileSize(logPath);
-		if (size <= position) continue;
+		if (size <= position) {
+			continue;
+		}
 
 		const chunk = await deps.readFrom({
 			path: logPath,
@@ -111,7 +117,9 @@ export async function runLogs(
 		partial = parts.pop() ?? "";
 
 		for (const line of parts) {
-			if (line) process.stdout.write(`${formatLine(line)}\n`);
+			if (line) {
+				process.stdout.write(`${formatLine(line)}\n`);
+			}
 		}
 	}
 }

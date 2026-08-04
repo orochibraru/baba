@@ -12,11 +12,13 @@ export class LoadCheck extends BaseCheck {
 	}
 
 	async run(): Promise<string | undefined> {
-		if (!this.cfg.enabled) return;
+		if (!this.cfg.enabled) {
+			return;
+		}
 		const data = await si.currentLoad();
 		const avg = data.avgLoad;
 		logger.debug(`Load average: ${avg.toFixed(2)}`);
-		await this.breach({
+		await this.checkIfBreachedAndAlert({
 			metric: "load",
 			volume: null,
 			value: avg,

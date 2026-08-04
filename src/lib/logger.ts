@@ -8,7 +8,9 @@ import pino from "pino";
 /* c8 ignore next */
 async function createPinoLogger(): Promise<pino.Logger> {
 	/* c8 ignore next */
-	if (!process.stdout.isTTY) return pino({ level: "info" });
+	if (!process.stdout.isTTY) {
+		return pino({ level: "info" });
+	}
 	try {
 		const { default: pretty } = await import("pino-pretty");
 		return pino(

@@ -11,7 +11,9 @@ export async function getLatestVersion(): Promise<string | null> {
 		const res = await fetch(API_URL, {
 			headers: { "User-Agent": `baba/${packagejson.version}` },
 		});
-		if (!res.ok) return null;
+		if (!res.ok) {
+			return null;
+		}
 		const data = (await res.json()) as { tag_name?: string };
 		return data.tag_name?.replace(/^v/, "") ?? null;
 	} catch {
@@ -23,8 +25,12 @@ export function isNewerVersion(latest: string, current: string): boolean {
 	const parse = (v: string) => v.split(".").map(Number);
 	const [la, lb, lc] = parse(latest);
 	const [ca, cb, cc] = parse(current);
-	if (la !== ca) return (la ?? 0) > (ca ?? 0);
-	if (lb !== cb) return (lb ?? 0) > (cb ?? 0);
+	if (la !== ca) {
+		return (la ?? 0) > (ca ?? 0);
+	}
+	if (lb !== cb) {
+		return (lb ?? 0) > (cb ?? 0);
+	}
 	return (lc ?? 0) > (cc ?? 0);
 }
 

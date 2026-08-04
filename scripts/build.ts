@@ -69,9 +69,13 @@ export async function buildForTarget(
 			compile: { target },
 			outdir: tmpDir,
 		});
-		if (!res.success) return `Failed to build ${target}`;
+		if (!res.success) {
+			return `Failed to build ${target}`;
+		}
 		const out = res.outputs[0];
-		if (!out) return `No output produced for ${target}`;
+		if (!out) {
+			return `No output produced for ${target}`;
+		}
 		const ext = target.includes("windows") ? ".exe" : "";
 		deps.renameSync(out.path, `dist/${target}${ext}`);
 		return null;
@@ -88,14 +92,20 @@ export async function main(deps: BuildDeps = defaultDeps): Promise<void> {
 	for (const target of buildTargets()) {
 		logger.info(`Building ${target}...`);
 		const error = await buildForTarget(target, deps);
-		if (error) errors.push(error);
+		if (error) {
+			errors.push(error);
+		}
 	}
 	if (errors.length > 0) {
-		for (const err of errors) logger.error(err);
+		for (const err of errors) {
+			logger.error(err);
+		}
 		process.exit(1);
 	}
 	logger.info("Build complete.");
 }
 
 /* c8 ignore next */
-if (import.meta.main) void main();
+if (import.meta.main) {
+	void main();
+}

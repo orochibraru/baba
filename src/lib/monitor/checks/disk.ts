@@ -13,13 +13,17 @@ export class DiskCheck extends BaseCheck {
 	}
 
 	async run(): Promise<string | undefined> {
-		if (!this.cfg.enabled) return;
+		if (!this.cfg.enabled) {
+			return;
+		}
 		const allVolumes = await si.fsSize();
 		const selected = allVolumes.filter(
 			(v) =>
 				this.cfg.volumes.includes(v.fs) || this.cfg.volumes.includes(v.mount),
 		);
-		if (selected.length === 0) return "No volumes found";
+		if (selected.length === 0) {
+			return "No volumes found";
+		}
 
 		let total = 0;
 		for (const vol of selected) {
@@ -33,7 +37,7 @@ export class DiskCheck extends BaseCheck {
 				`Disk ${vol.fs}: ${usage}% (${humanReadableBytes(consumed)} / ${humanReadableBytes(vol.size)})`,
 			);
 			total += usage;
-			await this.breach({
+			await this.checkIfBreachedAndAlert({
 				metric: "disk",
 				volume: vol.fs,
 				value: usage,

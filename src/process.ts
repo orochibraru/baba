@@ -29,7 +29,9 @@ export class Process {
 	}
 
 	private async checkForUpdates(): Promise<void> {
-		if (!this.config) return;
+		if (!this.config) {
+			return;
+		}
 		// Suppress notification for a short window after `baba update` succeeds,
 		// in case the shell is still hashing the old binary.
 		const markerPath = join(
@@ -40,7 +42,9 @@ export class Process {
 		if (await marker.exists()) {
 			const age = Date.now() - new Date(await marker.text()).getTime();
 			await unlink(markerPath).catch(() => {});
-			if (age < 5 * 60 * 1000) return;
+			if (age < 5 * 60 * 1000) {
+				return;
+			}
 		}
 
 		const latest = await getLatestVersion();

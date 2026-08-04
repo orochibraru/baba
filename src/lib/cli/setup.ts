@@ -32,7 +32,9 @@ function makeAsker(prompt: SetupDeps["prompt"]): Asker {
 		async num(label, def) {
 			const answer = await prompt(`  ${label} [${def}]: `);
 			const t = answer.trim();
-			if (!t) return def;
+			if (!t) {
+				return def;
+			}
 			const n = Number(t);
 			if (Number.isNaN(n)) {
 				process.stdout.write(`  Invalid number — using ${def}\n`);
@@ -44,7 +46,9 @@ function makeAsker(prompt: SetupDeps["prompt"]): Asker {
 			const hint = def ? "Y/n" : "y/N";
 			const answer = await prompt(`  ${label} [${hint}]: `);
 			const t = answer.trim().toLowerCase();
-			if (!t) return def;
+			if (!t) {
+				return def;
+			}
 			return t === "y" || t === "yes";
 		},
 	};
@@ -132,7 +136,9 @@ export async function setup({ configPath, deps }: SetupArgs): Promise<void> {
 			"Webhook URL (Channel Settings → Integrations → Webhooks)",
 			String(existingDiscord?.webhookUrl ?? ""),
 		);
-		if (webhookUrl) notifiers.push({ type: "discord", webhookUrl });
+		if (webhookUrl) {
+			notifiers.push({ type: "discord", webhookUrl });
+		}
 	}
 
 	const addTelegram = await ask.bool(
@@ -148,8 +154,9 @@ export async function setup({ configPath, deps }: SetupArgs): Promise<void> {
 			"Chat ID (user ID, group ID prefixed with -, or @channel)",
 			String(existingTelegram?.chatId ?? ""),
 		);
-		if (botToken && chatId)
+		if (botToken && chatId) {
 			notifiers.push({ type: "telegram", botToken, chatId });
+		}
 	}
 
 	// ── Checks ────────────────────────────────────────────────────────────────

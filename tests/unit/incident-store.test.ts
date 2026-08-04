@@ -234,13 +234,14 @@ describe("listIncidents", () => {
 	});
 
 	test("respects the limit parameter", () => {
-		for (let i = 0; i < 5; i++)
+		for (let i = 0; i < 5; i++) {
 			store.openIncident({
 				metric: "cpu",
 				volume: null,
 				value: 95,
 				threshold: 90,
 			});
+		}
 		expect(store.listIncidents(3)).toHaveLength(3);
 	});
 });

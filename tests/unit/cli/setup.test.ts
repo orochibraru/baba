@@ -31,7 +31,9 @@ function makeTestDeps({ prompts, existing = null }: TestOpts): {
 }
 
 function parseWritten(written: Written | null): Record<string, unknown> {
-	if (!written) throw new Error("Nothing was written");
+	if (!written) {
+		throw new Error("Nothing was written");
+	}
 	return JSON.parse(written.content) as Record<string, unknown>;
 }
 

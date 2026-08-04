@@ -114,7 +114,9 @@ function makeDeps(overrides?: Partial<CheckDeps>): CheckDeps {
 beforeEach(() => {
 	diskData = [];
 	notifySpy.mockClear();
-	for (const spy of Object.values(incidentStoreMock)) spy.mockClear();
+	for (const spy of Object.values(incidentStoreMock)) {
+		spy.mockClear();
+	}
 	incidentStoreMock.getActiveIncident.mockImplementation(() => null);
 	incidentStoreMock.openIncident.mockImplementation(() => fakeIncident());
 	incidentStoreMock.getLastNotification.mockImplementation(() => null);

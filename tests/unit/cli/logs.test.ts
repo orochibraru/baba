@@ -126,7 +126,9 @@ describe("runLogs", () => {
 			readFrom: mock(async () => `${newLine}\n`),
 			sleep: mock(async () => {
 				// Stop after second poll by throwing
-				if (callCount >= 2) throw new Error("stop");
+				if (callCount >= 2) {
+					throw new Error("stop");
+				}
 			}),
 		});
 

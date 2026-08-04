@@ -191,7 +191,9 @@ function setPath({ obj, path, value }: SetPathOpts): void {
 	let cur = obj;
 	for (let i = 0; i < path.length - 1; i++) {
 		const key = path[i] ?? "";
-		if (typeof cur[key] !== "object" || cur[key] === null) cur[key] = {};
+		if (typeof cur[key] !== "object" || cur[key] === null) {
+			cur[key] = {};
+		}
 		cur = cur[key] as Record<string, unknown>;
 	}
 	const last = path[path.length - 1] ?? "";
@@ -203,7 +205,9 @@ function applyNotifierEnvOverrides(raw: Record<string, unknown>): void {
 	const tgToken = process.env.BABA_NOTIFIERS_TELEGRAM_BOT_TOKEN;
 	const tgChatId = process.env.BABA_NOTIFIERS_TELEGRAM_CHAT_ID;
 
-	if (!discordUrl && !tgToken && !tgChatId) return;
+	if (!discordUrl && !tgToken && !tgChatId) {
+		return;
+	}
 
 	let notifiers: Record<string, unknown>[] = Array.isArray(raw.notifiers)
 		? (raw.notifiers as Record<string, unknown>[])
@@ -235,7 +239,9 @@ function applyNotifierEnvOverrides(raw: Record<string, unknown>): void {
 function applyEnvOverrides(raw: Record<string, unknown>): void {
 	for (const [name, def] of Object.entries(ENV_VARS)) {
 		const val = process.env[name];
-		if (val == null || val === "") continue;
+		if (val == null || val === "") {
+			continue;
+		}
 		try {
 			setPath({ obj: raw, path: def.path, value: coerceEnv(val, def.type) });
 			logger.debug(`Env override applied: ${name}`);

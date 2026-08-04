@@ -61,7 +61,9 @@ export async function runChecks(
 	// 3. Host system metrics are readable (validates --pid=host and /proc access)
 	try {
 		const mem = await deps.siMem();
-		if (!mem.total) throw new Error("mem.total is 0 — is --pid=host set?");
+		if (!mem.total) {
+			throw new Error("mem.total is 0 — is --pid=host set?");
+		}
 		results.push({ name: "system", ok: true });
 	} catch (err) {
 		results.push({ name: "system", ok: false, detail: String(err) });

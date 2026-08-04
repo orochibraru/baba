@@ -102,7 +102,9 @@ beforeEach(() => {
 	cpuTempData = { main: null, max: null, cores: [], socket: [], chipset: null };
 	graphicsData = { controllers: [] };
 	notifySpy.mockClear();
-	for (const spy of Object.values(incidentStoreMock)) spy.mockClear();
+	for (const spy of Object.values(incidentStoreMock)) {
+		spy.mockClear();
+	}
 	incidentStoreMock.getActiveIncident.mockImplementation(() => null);
 	incidentStoreMock.openIncident.mockImplementation(() => fakeIncident());
 	incidentStoreMock.getLastNotification.mockImplementation(() => null);

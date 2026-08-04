@@ -17,6 +17,9 @@
 		"enabled": true,
 		"rules": {
 			"preset": "recommended",
+			"style": {
+				"useBlockStatements": "error"
+			},
 			"suspicious": {
 				"noConsole": "error"
 			},

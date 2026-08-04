@@ -74,7 +74,9 @@ async function installMacos(deps: InstallDeps): Promise<void> {
 
 	await deps.exec(["launchctl", "unload", plistPath]);
 	const load = await deps.exec(["launchctl", "load", "-w", plistPath]);
-	if (!load.ok) throw new Error(`launchctl load failed: ${load.out}`);
+	if (!load.ok) {
+		throw new Error(`launchctl load failed: ${load.out}`);
+	}
 
 	process.stdout.write(
 		`Service loaded — baba will start on login and restart automatically.\nLogs: ${LOG_PATH}\n`,
@@ -108,13 +110,19 @@ WantedBy=multi-user.target
 
 	if (sudoCopy.ok) {
 		const reload = await deps.exec(["sudo", "systemctl", "daemon-reload"]);
-		if (!reload.ok) throw new Error(`daemon-reload failed: ${reload.out}`);
+		if (!reload.ok) {
+			throw new Error(`daemon-reload failed: ${reload.out}`);
+		}
 
 		const enable = await deps.exec(["sudo", "systemctl", "enable", "baba"]);
-		if (!enable.ok) throw new Error(`systemctl enable failed: ${enable.out}`);
+		if (!enable.ok) {
+			throw new Error(`systemctl enable failed: ${enable.out}`);
+		}
 
 		const start = await deps.exec(["sudo", "systemctl", "start", "baba"]);
-		if (!start.ok) throw new Error(`systemctl start failed: ${start.out}`);
+		if (!start.ok) {
+			throw new Error(`systemctl start failed: ${start.out}`);
+		}
 
 		process.stdout.write(
 			`Wrote ${systemUnit}\nSystem service enabled and started — baba runs on boot.\nCheck status: sudo systemctl status baba\nLogs: sudo journalctl -u baba -f\n`,
@@ -135,13 +143,19 @@ WantedBy=multi-user.target
 		process.stdout.write(`Wrote ${userUnit}\n`);
 
 		const reload = await deps.exec(["systemctl", "--user", "daemon-reload"]);
-		if (!reload.ok) throw new Error(`daemon-reload failed: ${reload.out}`);
+		if (!reload.ok) {
+			throw new Error(`daemon-reload failed: ${reload.out}`);
+		}
 
 		const enable = await deps.exec(["systemctl", "--user", "enable", "baba"]);
-		if (!enable.ok) throw new Error(`systemctl enable failed: ${enable.out}`);
+		if (!enable.ok) {
+			throw new Error(`systemctl enable failed: ${enable.out}`);
+		}
 
 		const start = await deps.exec(["systemctl", "--user", "start", "baba"]);
-		if (!start.ok) throw new Error(`systemctl start failed: ${start.out}`);
+		if (!start.ok) {
+			throw new Error(`systemctl start failed: ${start.out}`);
+		}
 
 		process.stdout.write(
 			"User service enabled and started.\nCheck status: systemctl --user status baba\nLogs: journalctl --user -u baba -f\n",

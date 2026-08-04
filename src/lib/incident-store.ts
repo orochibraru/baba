@@ -51,7 +51,9 @@ export class IncidentStore {
 				"INSERT INTO incidents (metric, volume, started_at, peak_value, threshold) VALUES (?, ?, ?, ?, ?) RETURNING id",
 			)
 			.get(metric, volume, now, value, threshold) as { id: number } | null;
-		if (!row) throw new Error("Failed to open incident");
+		if (!row) {
+			throw new Error("Failed to open incident");
+		}
 		return {
 			id: row.id,
 			metric,
@@ -121,7 +123,9 @@ export class IncidentStore {
 		const incident = this.db
 			.query("SELECT * FROM incidents WHERE id = ?")
 			.get(id) as Incident | null;
-		if (!incident) return null;
+		if (!incident) {
+			return null;
+		}
 		const notifications = this.db
 			.query(
 				"SELECT * FROM notifications WHERE incident_id = ? ORDER BY sent_at ASC",

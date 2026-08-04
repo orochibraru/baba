@@ -13,7 +13,9 @@ export class MemoryCheck extends BaseCheck {
 	}
 
 	async run(): Promise<string | undefined> {
-		if (!this.cfg.enabled) return;
+		if (!this.cfg.enabled) {
+			return;
+		}
 		const mem = await si.mem();
 		// Prefer total - available (excludes page cache/buffers, matches htop/btop).
 		// Fall back to mem.used when available is absent (e.g. some container runtimes).
@@ -24,7 +26,7 @@ export class MemoryCheck extends BaseCheck {
 		logger.debug(
 			`Memory: ${usage}% (${humanReadableBytes(actualUsed)} / ${humanReadableBytes(mem.total)})`,
 		);
-		await this.breach({
+		await this.checkIfBreachedAndAlert({
 			metric: "memory",
 			volume: null,
 			value: usage,

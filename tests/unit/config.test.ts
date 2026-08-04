@@ -19,13 +19,17 @@ describe("ConfigSchema", () => {
 		test("applies default logLevel of info", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.logLevel).toBe("info");
+			if (r.success) {
+				expect(r.data.logLevel).toBe("info");
+			}
 		});
 
 		test("applies default intervalSeconds of 60", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.intervalSeconds).toBe(60);
+			if (r.success) {
+				expect(r.data.intervalSeconds).toBe(60);
+			}
 		});
 
 		test("applies default cpu check values", () => {
@@ -92,13 +96,17 @@ describe("ConfigSchema", () => {
 		test("applies default reminderIntervalMinutes of 30", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.reminderIntervalMinutes).toBe(30);
+			if (r.success) {
+				expect(r.data.reminderIntervalMinutes).toBe(30);
+			}
 		});
 
 		test("applies default database path", () => {
 			const r = ConfigSchema.safeParse(minimal);
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.database.path).toBe("/var/lib/baba/baba.db");
+			if (r.success) {
+				expect(r.data.database.path).toBe("/var/lib/baba/baba.db");
+			}
 		});
 	});
 
@@ -106,7 +114,9 @@ describe("ConfigSchema", () => {
 		test("accepts custom intervalSeconds", () => {
 			const r = ConfigSchema.safeParse({ ...minimal, intervalSeconds: 30 });
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.intervalSeconds).toBe(30);
+			if (r.success) {
+				expect(r.data.intervalSeconds).toBe(30);
+			}
 		});
 
 		test("accepts valid logLevel values", () => {
@@ -119,7 +129,9 @@ describe("ConfigSchema", () => {
 			] as const) {
 				const r = ConfigSchema.safeParse({ ...minimal, logLevel: level });
 				expect(r.success).toBe(true);
-				if (r.success) expect(r.data.logLevel).toBe(level);
+				if (r.success) {
+					expect(r.data.logLevel).toBe(level);
+				}
 			}
 		});
 
@@ -157,7 +169,9 @@ describe("ConfigSchema", () => {
 				],
 			});
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.notifiers).toHaveLength(2);
+			if (r.success) {
+				expect(r.data.notifiers).toHaveLength(2);
+			}
 		});
 
 		test("accepts a valid Telegram notifier", () => {
@@ -185,7 +199,9 @@ describe("ConfigSchema", () => {
 				],
 			});
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.notifiers).toHaveLength(2);
+			if (r.success) {
+				expect(r.data.notifiers).toHaveLength(2);
+			}
 		});
 
 		test("accepts disabled checks", () => {
@@ -194,7 +210,9 @@ describe("ConfigSchema", () => {
 				checks: { cpu: { enabled: false } },
 			});
 			expect(r.success).toBe(true);
-			if (r.success) expect(r.data.checks.cpu.enabled).toBe(false);
+			if (r.success) {
+				expect(r.data.checks.cpu.enabled).toBe(false);
+			}
 		});
 	});
 
@@ -205,10 +223,11 @@ describe("ConfigSchema", () => {
 					notifiers: [{ type: "discord", webhookUrl: "not-a-url" }],
 				});
 				expect(r.success).toBe(false);
-				if (!r.success)
+				if (!r.success) {
 					expect(r.error.issues[0]?.message).toContain(
 						"Must be a valid Discord webhook URL",
 					);
+				}
 			});
 
 			test("rejects a missing webhookUrl", () => {
@@ -241,10 +260,11 @@ describe("ConfigSchema", () => {
 					notifiers: [{ type: "telegram", botToken: "", chatId: "-100123" }],
 				});
 				expect(r.success).toBe(false);
-				if (!r.success)
+				if (!r.success) {
 					expect(r.error.issues[0]?.message).toContain(
 						"Bot token cannot be empty",
 					);
+				}
 			});
 
 			test("rejects a missing chatId", () => {
@@ -259,10 +279,11 @@ describe("ConfigSchema", () => {
 					notifiers: [{ type: "telegram", botToken: "123:ABC", chatId: "" }],
 				});
 				expect(r.success).toBe(false);
-				if (!r.success)
+				if (!r.success) {
 					expect(r.error.issues[0]?.message).toContain(
 						"Chat ID cannot be empty",
 					);
+				}
 			});
 
 			test("rejects extra unknown fields", () => {
@@ -311,10 +332,11 @@ describe("ConfigSchema", () => {
 		test("rejects an invalid logLevel", () => {
 			const r = ConfigSchema.safeParse({ ...minimal, logLevel: "verbose" });
 			expect(r.success).toBe(false);
-			if (!r.success)
+			if (!r.success) {
 				expect(r.error.issues[0]?.message).toContain(
 					'Must be one of: "trace", "debug"',
 				);
+			}
 		});
 
 		test("rejects zero intervalSeconds", () => {
@@ -449,7 +471,9 @@ describe("loadConfig", () => {
 	describe("env var overrides", () => {
 		afterEach(() => {
 			for (const key of Object.keys(process.env)) {
-				if (key.startsWith("BABA_")) delete process.env[key];
+				if (key.startsWith("BABA_")) {
+					delete process.env[key];
+				}
 			}
 		});
 

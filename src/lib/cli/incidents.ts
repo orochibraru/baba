@@ -62,7 +62,9 @@ export async function getIncident(
 	const status = incident.resolved_at ? "RESOLVED" : "OPEN";
 	console.log(`\nIncident #${incident.id}`);
 	console.log(`  Metric:     ${incident.metric}`);
-	if (incident.volume) console.log(`  Volume:     ${incident.volume}`);
+	if (incident.volume) {
+		console.log(`  Volume:     ${incident.volume}`);
+	}
 	console.log(`  Status:     ${status}`);
 	console.log(`  Started:    ${formatDate(incident.started_at)}`);
 	if (incident.resolved_at) {

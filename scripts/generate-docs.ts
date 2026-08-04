@@ -103,19 +103,35 @@ type JsonSchema = {
 };
 
 function schemaType(s: JsonSchema): string {
-	if (s.const !== undefined) return fence(String(s.const));
-	if (s.enum) return s.enum.map((v) => `\`${v}\``).join(" \\| ");
-	if (s.anyOf) return s.anyOf.map(schemaType).join(" \\| ");
-	if (s.oneOf) return s.oneOf.map(schemaType).join(" \\| ");
-	if (Array.isArray(s.type)) return s.type.join(" \\| ");
-	if (s.type === "array" && s.items) return `${schemaType(s.items)}[]`;
+	if (s.const !== undefined) {
+		return fence(String(s.const));
+	}
+	if (s.enum) {
+		return s.enum.map((v) => `\`${v}\``).join(" \\| ");
+	}
+	if (s.anyOf) {
+		return s.anyOf.map(schemaType).join(" \\| ");
+	}
+	if (s.oneOf) {
+		return s.oneOf.map(schemaType).join(" \\| ");
+	}
+	if (Array.isArray(s.type)) {
+		return s.type.join(" \\| ");
+	}
+	if (s.type === "array" && s.items) {
+		return `${schemaType(s.items)}[]`;
+	}
 	return s.type ?? "any";
 }
 
 function schemaDefault(s: JsonSchema): string {
-	if (s.default === undefined) return "—";
+	if (s.default === undefined) {
+		return "—";
+	}
 	const v = s.default;
-	if (typeof v === "object") return fence(JSON.stringify(v));
+	if (typeof v === "object") {
+		return fence(JSON.stringify(v));
+	}
 	return fence(String(v));
 }
 
@@ -164,7 +180,9 @@ function notifierFieldTable(schema: z.ZodType): string {
 		target: "draft-7",
 		unrepresentable: "any",
 	}) as JsonSchema;
-	if (!js.properties) return "";
+	if (!js.properties) {
+		return "";
+	}
 	const rows = Object.entries(js.properties).map(([field, fieldSchema]) => {
 		const s = fieldSchema as JsonSchema;
 		return row(`\`${field}\``, schemaType(s), s.description ?? "—");

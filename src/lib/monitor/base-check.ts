@@ -15,7 +15,7 @@ export abstract class BaseCheck {
 
 	abstract run(): Promise<string | undefined>;
 
-	protected async breach(opts: BreachOpts): Promise<void> {
+	protected async checkIfBreachedAndAlert(opts: BreachOpts): Promise<void> {
 		const {
 			metric,
 			volume,
