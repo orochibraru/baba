@@ -1,3 +1,20 @@
+## [1.0.16](https://github.com/orochibraru/baba/compare/v1.0.15...v1.0.16) (2026-08-05)
+
+
+### Features
+
+* uninstall & restart commands ([8f8f045](https://github.com/orochibraru/baba/commit/8f8f045221e446473324f05f317637a5d906cdcb))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.16
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.15](https://github.com/orochibraru/baba/compare/v1.0.14...v1.0.15) (2026-08-05)
 
 
