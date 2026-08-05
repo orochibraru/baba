@@ -1,34 +1,23 @@
 import { mkdirSync as fsMkdirSync } from "node:fs";
-import { homedir, platform as osPlatform } from "node:os";
-import { dirname, join } from "node:path";
-
-const BINARY_PATH = "/usr/local/bin/baba";
-const CONFIG_PATH = "/var/lib/baba/config.json";
-const LOG_PATH = "/var/lib/baba/baba.log";
+import { platform as osPlatform } from "node:os";
+import { dirname } from "node:path";
+import { defaultExec, type ExecFn } from "./exec";
+import {
+	BINARY_PATH,
+	CONFIG_PATH,
+	LOG_PATH,
+	linuxSystemUnitPath,
+	linuxUserUnitPath,
+	macosPlistPath,
+} from "./service-paths";
 
 export type InstallDeps = {
 	platform: () => NodeJS.Platform;
 	configExists: (path: string) => Promise<boolean>;
 	writeFile: (path: string, content: string) => Promise<void>;
-	exec: (cmd: string[]) => Promise<{ ok: boolean; out: string }>;
+	exec: ExecFn;
 	mkdirSync: (path: string, opts?: { recursive?: boolean }) => void;
 };
-
-async function defaultExec(
-	cmd: string[],
-): Promise<{ ok: boolean; out: string }> {
-	try {
-		const proc = Bun.spawn(cmd, { stdout: "pipe", stderr: "pipe" });
-		const [stdout, stderr, exit] = await Promise.all([
-			new Response(proc.stdout).text(),
-			new Response(proc.stderr).text(),
-			proc.exited,
-		]);
-		return { ok: exit === 0, out: (stdout + stderr).trim() };
-	} catch (err) {
-		return { ok: false, out: String(err) };
-	}
-}
 
 const defaultDeps: InstallDeps = {
 	platform: osPlatform,
@@ -41,10 +30,9 @@ const defaultDeps: InstallDeps = {
 };
 
 async function installMacos(deps: InstallDeps): Promise<void> {
-	const plistDir = join(homedir(), "Library/LaunchAgents");
-	const plistPath = join(plistDir, "com.orochibraru.baba.plist");
+	const plistPath = macosPlistPath();
 
-	deps.mkdirSync(plistDir, { recursive: true });
+	deps.mkdirSync(dirname(plistPath), { recursive: true });
 	await deps.writeFile(
 		plistPath,
 		`<?xml version="1.0" encoding="UTF-8"?>
@@ -84,8 +72,8 @@ async function installMacos(deps: InstallDeps): Promise<void> {
 }
 
 async function installLinux(deps: InstallDeps): Promise<void> {
-	const systemUnit = "/etc/systemd/system/baba.service";
-	const userUnit = join(homedir(), ".config/systemd/user/baba.service");
+	const systemUnit = linuxSystemUnitPath();
+	const userUnit = linuxUserUnitPath();
 
 	const systemContent = `[Unit]
 Description=baba server monitor

@@ -155,6 +155,8 @@ See [`docs/config.md`](docs/config.md) for the full reference.
 |---|---|
 | `baba setup` | Interactive setup wizard — writes `/var/lib/baba/config.json` |
 | `baba install` | Register baba as a background service (launchd on macOS, systemd on Linux) |
+| `baba restart` | Restart the background service |
+| `baba uninstall [--purge]` | Remove the background service; `--purge` also deletes config, database, and logs |
 | `baba start` | Start the monitoring loop in the foreground |
 | `baba logs [-f] [-n N]` | Show logs from the background service; `-f` to follow, `-n` for line count (default 100) |
 | `baba update` | Check for a newer release and replace the binary in-place |
@@ -178,6 +180,8 @@ baba logs -f  # follow live output
 **Linux** — tries to register a systemd system service at `/etc/systemd/system/baba.service` (requires `sudo`). Starts on boot, restarts on crash. If `sudo` is unavailable, falls back to a user service at `~/.config/systemd/user/baba.service` (only runs while logged in). Logs go to `/var/lib/baba/baba.log`.
 
 To reinstall after changing config or updating the binary, just run `baba install` again — it replaces the existing service definition and restarts.
+
+Use `baba restart` to restart the service without touching its definition (e.g. after editing `config.json`). Use `baba uninstall` to unregister it — config and data at `/var/lib/baba` are kept by default so you can reinstall later; pass `--purge` to remove those too.
 
 ## Environment variables
 

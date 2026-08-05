@@ -6,7 +6,9 @@ import { health } from "./lib/cli/health";
 import { getIncident, listIncidents } from "./lib/cli/incidents";
 import { runInstall } from "./lib/cli/install";
 import { runLogs } from "./lib/cli/logs";
+import { runRestart } from "./lib/cli/restart";
 import { runSetup } from "./lib/cli/setup";
+import { runUninstall } from "./lib/cli/uninstall";
 import { runUpdate } from "./lib/cli/update";
 import { validate } from "./lib/cli/validate";
 import { logger } from "./lib/logger";
@@ -89,6 +91,31 @@ program
 	.action(async () => {
 		logger.debug("CMD called: install");
 		await runInstall();
+	});
+
+program
+	.command("restart")
+	.description(
+		"Restart the background service (launchd on macOS, systemd on Linux).",
+	)
+	.action(async () => {
+		logger.debug("CMD called: restart");
+		await runRestart();
+	});
+
+program
+	.command("uninstall")
+	.description(
+		"Remove the background service. Config and data are kept unless --purge is passed.",
+	)
+	.option(
+		"--purge",
+		"Also remove config, database, and logs from /var/lib/baba",
+		false,
+	)
+	.action(async (opts: { purge: boolean }) => {
+		logger.debug("CMD called: uninstall");
+		await runUninstall({ purge: opts.purge });
 	});
 
 program
