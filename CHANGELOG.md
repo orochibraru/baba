@@ -1,3 +1,20 @@
+## [1.0.19](https://github.com/orochibraru/baba/compare/v1.0.18...v1.0.19) (2026-08-05)
+
+
+### Bug Fixes
+
+* version matching when running update command ([9751907](https://github.com/orochibraru/baba/commit/975190763f281d6d9544966e7efcf520093493e9))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.19
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.18](https://github.com/orochibraru/baba/compare/v1.0.17...v1.0.18) (2026-08-05)
 
 
