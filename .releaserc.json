@@ -86,6 +86,36 @@
 						"label": "Windows ARM64"
 					},
 					{
+						"path": "dist/bun-linux-x64",
+						"name": "baba-linux-x64",
+						"label": "Linux x64 (uncompressed, for baba update on pre-1.0.15 installs)"
+					},
+					{
+						"path": "dist/bun-linux-arm64",
+						"name": "baba-linux-arm64",
+						"label": "Linux ARM64 (uncompressed, for baba update on pre-1.0.15 installs)"
+					},
+					{
+						"path": "dist/bun-darwin-x64",
+						"name": "baba-darwin-x64",
+						"label": "macOS Intel x64 (uncompressed, for baba update on pre-1.0.15 installs)"
+					},
+					{
+						"path": "dist/bun-darwin-arm64",
+						"name": "baba-darwin-arm64",
+						"label": "macOS Apple Silicon (uncompressed, for baba update on pre-1.0.15 installs)"
+					},
+					{
+						"path": "dist/bun-windows-x64.exe",
+						"name": "baba-windows-x64.exe",
+						"label": "Windows x64 (uncompressed, for baba update on pre-1.0.15 installs)"
+					},
+					{
+						"path": "dist/bun-windows-arm64.exe",
+						"name": "baba-windows-arm64.exe",
+						"label": "Windows ARM64 (uncompressed, for baba update on pre-1.0.15 installs)"
+					},
+					{
 						"path": "scripts/install.sh",
 						"name": "install.sh",
 						"label": "Install Script (Linux / macOS)"
