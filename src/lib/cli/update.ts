@@ -8,15 +8,24 @@ const API_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
 
 export async function getLatestVersion(): Promise<string | null> {
 	try {
+		logger.debug("Fetching latest version...");
 		const res = await fetch(API_URL, {
 			headers: { "User-Agent": `baba/${packagejson.version}` },
 		});
 		if (!res.ok) {
+			logger.error("Failed to fetch latest version:", res.statusText);
 			return null;
 		}
+		logger.debug("Successfully fetched latest version.");
 		const data = (await res.json()) as { tag_name?: string };
+		logger.debug("Successfully parsed latest version:", data.tag_name);
 		return data.tag_name?.replace(/^v/, "") ?? null;
-	} catch {
+	} catch (e) {
+		if (e instanceof Error) {
+			logger.error(`Failed to parse latest version: ${e.message}`);
+		} else {
+			logger.error(`Failed to parse latest version: ${String(e)}`);
+		}
 		return null;
 	}
 }
