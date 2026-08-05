@@ -74,6 +74,14 @@ type HttpRecord = { method: string; path: string; body: unknown };
 const httpLog: HttpRecord[] = [];
 let server: ReturnType<typeof Bun.serve>;
 
+function firstRequest(): HttpRecord {
+	const req = httpLog[0];
+	if (!req) {
+		throw new Error("expected at least one captured request");
+	}
+	return req;
+}
+
 beforeAll(() => {
 	server = Bun.serve({
 		port: 0,
@@ -140,10 +148,11 @@ describe("Discord alerts", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		const req = httpLog[0];
-		expect(req?.method).toBe("POST");
-		expect((req?.body as { content: string }).content).toContain("test-host");
-		expect((req?.body as { content: string }).content).toContain("CPU");
+		const req = firstRequest();
+		expect(req.method).toBe("POST");
+		const body = req.body as { content: string };
+		expect(body.content).toContain("test-host");
+		expect(body.content).toContain("CPU");
 	});
 
 	test("does not send alert when CPU is below threshold", async () => {
@@ -209,9 +218,8 @@ describe("Discord alerts", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		expect((httpLog[0]?.body as { content: string }).content).toContain(
-			"Back to normal",
-		);
+		const recoveryBody = firstRequest().body as { content: string };
+		expect(recoveryBody.content).toContain("Back to normal");
 		expect(store.getActiveIncident("cpu")).toBeNull();
 		expect(
 			store.getIncident(incidentAfterBreach?.id ?? 0)?.resolved_at,
@@ -256,13 +264,13 @@ describe("Telegram alerts", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		const req = httpLog[0];
-		expect(req?.path).toBe(`/bot${BOT_TOKEN}/sendMessage`);
-		expect((req?.body as { chat_id: string; text: string }).chat_id).toBe(
+		const req = firstRequest();
+		expect(req.path).toBe(`/bot${BOT_TOKEN}/sendMessage`);
+		expect((req.body as { chat_id: string; text: string }).chat_id).toBe(
 			CHAT_ID,
 		);
-		expect((req?.body as { text: string }).text).toContain("test-host");
-		expect((req?.body as { text: string }).text).toContain("CPU");
+		expect((req.body as { text: string }).text).toContain("test-host");
+		expect((req.body as { text: string }).text).toContain("CPU");
 	});
 
 	test("sends recovery alert via Telegram when CPU drops", async () => {
@@ -279,9 +287,8 @@ describe("Telegram alerts", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		expect((httpLog[0]?.body as { text: string }).text).toContain(
-			"Back to normal",
-		);
+		const recoveryBody = firstRequest().body as { text: string };
+		expect(recoveryBody.text).toContain("Back to normal");
 	});
 });
 
@@ -375,7 +382,7 @@ describe("Temperature check", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		const content = (httpLog[0]?.body as { content: string }).content;
+		const content = (firstRequest().body as { content: string }).content;
 		expect(content).toContain("CPU TEMP");
 		expect(content).toContain("90°C");
 		expect(content).toContain("test-host");
@@ -395,7 +402,9 @@ describe("Temperature check", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		expect((httpLog[0]?.body as { content: string }).content).toContain("92°C");
+		expect((firstRequest().body as { content: string }).content).toContain(
+			"92°C",
+		);
 	});
 
 	test("sends recovery alert when temperature drops below threshold", async () => {
@@ -412,9 +421,8 @@ describe("Temperature check", () => {
 		await monitor.runAllParallel();
 
 		expect(httpLog).toHaveLength(1);
-		expect((httpLog[0]?.body as { content: string }).content).toContain(
-			"Back to normal",
-		);
+		const recoveryBody = firstRequest().body as { content: string };
+		expect(recoveryBody.content).toContain("Back to normal");
 		expect(store.getActiveIncident("temp:cpu")).toBeNull();
 	});
 });

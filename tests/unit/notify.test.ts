@@ -37,9 +37,8 @@ describe("notify", () => {
 		await notifiers.alert("CPU is too hot");
 		expect(fetchSpy).toHaveBeenCalledTimes(1);
 		expect(fetchSpy.mock.calls[0]?.[0]).toBe(WEBHOOK);
-		const body = JSON.parse(
-			(fetchSpy.mock.calls[0]?.[1] as RequestInit).body as string,
-		);
+		const init = fetchSpy.mock.calls[0]?.[1] as RequestInit;
+		const body = JSON.parse(init.body as string);
 		expect(body.content).toBe("CPU is too hot");
 	});
 

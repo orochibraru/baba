@@ -142,9 +142,8 @@ describe("TelegramNotifier", () => {
 				chatId: CHAT_ID,
 			});
 			await notifier.validate();
-			const body = JSON.parse(
-				(fetchSpy.mock.calls[0]?.[1] as RequestInit).body as string,
-			);
+			const init = fetchSpy.mock.calls[0]?.[1] as RequestInit;
+			const body = JSON.parse(init.body as string);
 			expect(body.text).toBe("Validation message for Telegram");
 		});
 	});

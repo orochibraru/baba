@@ -87,9 +87,8 @@ describe("sendDiscordAlert", () => {
 			const notifier = new DiscordNotifier({ webhookUrl: WEBHOOK });
 			await notifier.validate();
 			expect(fetchSpy).toHaveBeenCalledTimes(1);
-			const body = JSON.parse(
-				(fetchSpy.mock.calls[0]?.[1] as RequestInit).body as string,
-			);
+			const init = fetchSpy.mock.calls[0]?.[1] as RequestInit;
+			const body = JSON.parse(init.body as string);
 			expect(body.content).toBe("Validation message for Discord");
 		});
 
