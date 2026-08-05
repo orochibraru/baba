@@ -1,4 +1,7 @@
-import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { Systeminformation } from "systeminformation";
 import type {
 	Incident,
@@ -60,7 +63,7 @@ mock.module("../../../src/config", () => ({
 }));
 
 import type { CheckDeps } from "../../../src/lib/monitor/base-check";
-import { GpuCheck } from "../../../src/lib/monitor/checks/gpu";
+import { GpuCheck, nvidiaSmiVram } from "../../../src/lib/monitor/checks/gpu";
 
 function fakeIncident(overrides: Partial<Incident> = {}): Incident {
 	return {
@@ -175,5 +178,52 @@ describe("GpuCheck", () => {
 			value: 95,
 			threshold: 80,
 		});
+	});
+});
+
+describe("nvidiaSmiVram", () => {
+	let binDir: string | undefined;
+	let origPath: string | undefined;
+
+	afterEach(() => {
+		if (binDir) {
+			rmSync(binDir, { recursive: true, force: true });
+			binDir = undefined;
+		}
+		if (origPath !== undefined) {
+			process.env.PATH = origPath;
+			origPath = undefined;
+		}
+	});
+
+	function fakeNvidiaSmi(output: string): void {
+		binDir = mkdtempSync(join(tmpdir(), "baba-nvidia-smi-"));
+		writeFileSync(
+			join(binDir, "nvidia-smi"),
+			`#!/bin/sh\nprintf '%s\\n' '${output.replace(/'/g, "'\\''")}'`,
+		);
+		chmodSync(join(binDir, "nvidia-smi"), 0o755);
+		origPath = process.env.PATH;
+		process.env.PATH = `${binDir}:${origPath ?? ""}`;
+	}
+
+	test("parses used/total memory into a VRAM percentage per GPU index", async () => {
+		fakeNvidiaSmi("1024, 4096\n3072, 4096");
+		const result = await nvidiaSmiVram();
+		expect(result.get(0)).toBe(25);
+		expect(result.get(1)).toBe(75);
+	});
+
+	test("skips lines with a zero or non-numeric total", async () => {
+		fakeNvidiaSmi("1024, 0\nnot-a-number, 4096");
+		const result = await nvidiaSmiVram();
+		expect(result.size).toBe(0);
+	});
+
+	test("returns an empty map when nvidia-smi is not on PATH", async () => {
+		origPath = process.env.PATH;
+		process.env.PATH = "/nonexistent";
+		const result = await nvidiaSmiVram();
+		expect(result.size).toBe(0);
 	});
 });

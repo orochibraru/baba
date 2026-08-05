@@ -139,6 +139,12 @@ describe("install.sh — URL construction", () => {
 		expect(exitCode).toBe(0);
 		expect(stdout).toContain("/releases/download/v1.2.3/baba-linux-x64");
 	});
+
+	test("downloads the gzip-compressed asset, not the raw binary", async () => {
+		const { stdout } = await runInstall({ os: "Linux", arch: "x86_64" });
+		expect(stdout).toContain("url=");
+		expect(stdout).toMatch(/url=.*baba-linux-x64\.gz$/m);
+	});
 });
 
 // ── environment overrides ─────────────────────────────────────────────────────

@@ -42,9 +42,9 @@ ASSET="${BIN_NAME}-${OS}-${ARCH}"
 # ── Build download URL ────────────────────────────────────────────────────────
 
 if [ "$VERSION" = "latest" ]; then
-    DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/${ASSET}"
+    DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/${ASSET}.gz"
 else
-    DOWNLOAD_URL="https://github.com/${REPO}/releases/download/v${VERSION}/${ASSET}"
+    DOWNLOAD_URL="https://github.com/${REPO}/releases/download/v${VERSION}/${ASSET}.gz"
 fi
 
 # ── Dry-run mode (used by tests) ──────────────────────────────────────────────
@@ -83,15 +83,19 @@ _fetch_to() {
 # ── Download binary ───────────────────────────────────────────────────────────
 
 echo "Downloading $ASSET..."
-TMP_BIN="$(mktemp)"
+TMP_GZ="$(mktemp)"
 if command -v curl >/dev/null 2>&1; then
-    curl -fsSL "$DOWNLOAD_URL" -o "$TMP_BIN"
+    curl -fsSL "$DOWNLOAD_URL" -o "$TMP_GZ"
 elif command -v wget >/dev/null 2>&1; then
-    wget -qO "$TMP_BIN" "$DOWNLOAD_URL"
+    wget -qO "$TMP_GZ" "$DOWNLOAD_URL"
 else
     echo "Error: curl or wget is required" >&2
     exit 1
 fi
+
+TMP_BIN="$(mktemp)"
+gzip -dc "$TMP_GZ" >"$TMP_BIN"
+rm -f "$TMP_GZ"
 chmod +x "$TMP_BIN"
 
 # ── Install binary ────────────────────────────────────────────────────────────

@@ -1,4 +1,10 @@
-import { mkdirSync, renameSync, rmSync } from "node:fs";
+import {
+	mkdirSync,
+	readFileSync,
+	renameSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { logger } from "../src/lib/logger";
 
 enum Architecture {
@@ -33,6 +39,9 @@ export type BuildDeps = {
 	mkdirSync: typeof mkdirSync;
 	renameSync: typeof renameSync;
 	rmSync: typeof rmSync;
+	readFileSync: typeof readFileSync;
+	writeFileSync: typeof writeFileSync;
+	gzipSync: typeof Bun.gzipSync;
 };
 
 const defaultDeps: BuildDeps = {
@@ -40,6 +49,9 @@ const defaultDeps: BuildDeps = {
 	mkdirSync,
 	renameSync,
 	rmSync,
+	readFileSync,
+	writeFileSync,
+	gzipSync: Bun.gzipSync,
 };
 
 export function buildTargets(): Bun.Build.CompileTarget[] {
@@ -77,7 +89,10 @@ export async function buildForTarget(
 			return `No output produced for ${target}`;
 		}
 		const ext = target.includes("windows") ? ".exe" : "";
-		deps.renameSync(out.path, `dist/${target}${ext}`);
+		const finalPath = `dist/${target}${ext}`;
+		deps.renameSync(out.path, finalPath);
+		const compressed = deps.gzipSync(deps.readFileSync(finalPath));
+		deps.writeFileSync(`${finalPath}.gz`, compressed);
 		return null;
 	} catch (e) {
 		return `Failed to build ${target}: ${e}`;

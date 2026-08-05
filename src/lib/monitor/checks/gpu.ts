@@ -5,7 +5,7 @@ import { BaseCheck, type CheckDeps } from "../base-check";
 
 // Returns a map of GPU index → VRAM usage % from nvidia-smi when si.graphics()
 // doesn't provide memory utilization data (common on Linux without full driver integration).
-async function nvidiaSmiVram(): Promise<Map<number, number>> {
+export async function nvidiaSmiVram(): Promise<Map<number, number>> {
 	const results = new Map<number, number>();
 	try {
 		const proc = Bun.spawn(
@@ -14,7 +14,7 @@ async function nvidiaSmiVram(): Promise<Map<number, number>> {
 				"--query-gpu=memory.used,memory.total",
 				"--format=csv,noheader,nounits",
 			],
-			{ stdout: "pipe", stderr: "pipe" },
+			{ stdout: "pipe", stderr: "pipe", env: process.env },
 		);
 		const text = await new Response(proc.stdout).text();
 		for (const [i, line] of text.trim().split("\n").entries()) {

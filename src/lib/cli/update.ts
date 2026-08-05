@@ -52,13 +52,33 @@ export async function resolveMarkerPath(): Promise<string> {
 	}
 }
 
-export async function runUpdate(): Promise<void> {
+export type UpdateDeps = {
+	getLatestVersion: typeof getLatestVersion;
+	fetch: typeof fetch;
+	gunzipSync: typeof Bun.gunzipSync;
+	writeFile: (path: string, data: Uint8Array | string) => Promise<void>;
+	spawnSync: (cmd: string[]) => { exitCode: number };
+	resolveMarkerPath: typeof resolveMarkerPath;
+};
+
+const defaultDeps: UpdateDeps = {
+	getLatestVersion,
+	fetch,
+	gunzipSync: Bun.gunzipSync,
+	writeFile: async (path, data) => {
+		await Bun.write(path, data);
+	},
+	spawnSync: (cmd) => Bun.spawnSync(cmd),
+	resolveMarkerPath,
+};
+
+export async function runUpdate(deps: UpdateDeps = defaultDeps): Promise<void> {
 	const current = packagejson.version;
 	process.stdout.write(
 		`Current version: v${current}\nChecking for updates...\n`,
 	);
 
-	const latest = await getLatestVersion();
+	const latest = await deps.getLatestVersion();
 	if (!latest) {
 		process.stdout.write(
 			"Could not reach GitHub releases — check your internet connection.\n",
@@ -76,11 +96,11 @@ export async function runUpdate(): Promise<void> {
 	const os = process.platform === "darwin" ? "darwin" : "linux";
 	const arch = process.arch === "arm64" ? "arm64" : "x64";
 	const asset = `baba-${os}-${arch}`;
-	const url = `https://github.com/${REPO}/releases/download/v${latest}/${asset}`;
+	const url = `https://github.com/${REPO}/releases/download/v${latest}/${asset}.gz`;
 
 	let res: Response;
 	try {
-		res = await fetch(url);
+		res = await deps.fetch(url);
 	} catch (err) {
 		process.stdout.write(`Download failed: ${String(err)}\n`);
 		return;
@@ -90,10 +110,19 @@ export async function runUpdate(): Promise<void> {
 		return;
 	}
 
-	const tmp = `/tmp/baba-update-${Date.now()}`;
-	await Bun.write(tmp, await res.arrayBuffer());
+	const compressed = new Uint8Array(await res.arrayBuffer());
+	let binary: Uint8Array;
+	try {
+		binary = deps.gunzipSync(compressed);
+	} catch (err) {
+		process.stdout.write(`Failed to decompress download: ${String(err)}\n`);
+		return;
+	}
 
-	const chmod = Bun.spawnSync(["chmod", "+x", tmp]);
+	const tmp = `/tmp/baba-update-${Date.now()}`;
+	await deps.writeFile(tmp, binary);
+
+	const chmod = deps.spawnSync(["chmod", "+x", tmp]);
 	if (chmod.exitCode !== 0) {
 		process.stdout.write("Failed to make binary executable.\n");
 		return;
@@ -104,9 +133,9 @@ export async function runUpdate(): Promise<void> {
 		? "/usr/local/bin/baba"
 		: process.execPath;
 
-	let mv = Bun.spawnSync(["mv", tmp, self]);
+	let mv = deps.spawnSync(["mv", tmp, self]);
 	if (mv.exitCode !== 0) {
-		mv = Bun.spawnSync(["sudo", "mv", tmp, self]);
+		mv = deps.spawnSync(["sudo", "mv", tmp, self]);
 		if (mv.exitCode !== 0) {
 			process.stdout.write(
 				`Failed to replace binary at ${self}.\nTry: sudo mv ${tmp} ${self}\n`,
@@ -117,8 +146,8 @@ export async function runUpdate(): Promise<void> {
 
 	// Leave a marker so the next startup skips the update notification,
 	// even if the shell is still hashing the old binary.
-	const markerPath = await resolveMarkerPath();
-	await Bun.write(markerPath, new Date().toISOString());
+	const markerPath = await deps.resolveMarkerPath();
+	await deps.writeFile(markerPath, new Date().toISOString());
 
 	logger.info(`Updated baba to v${latest}.`);
 	process.stdout.write(`Updated to v${latest}. Restart baba to apply.\n`);

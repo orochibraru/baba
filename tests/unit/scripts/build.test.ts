@@ -24,6 +24,15 @@ function makeDeps(overrides: Partial<BuildDeps> = {}): BuildDeps {
 			() => undefined,
 		) as unknown as typeof import("node:fs").renameSync,
 		rmSync: mock(() => undefined) as unknown as typeof import("node:fs").rmSync,
+		readFileSync: mock(() =>
+			Buffer.from("binary"),
+		) as unknown as typeof import("node:fs").readFileSync,
+		writeFileSync: mock(
+			() => undefined,
+		) as unknown as typeof import("node:fs").writeFileSync,
+		gzipSync: mock(
+			(data: Uint8Array) => data,
+		) as unknown as typeof Bun.gzipSync,
 		...overrides,
 	};
 }
@@ -97,6 +106,29 @@ describe("buildForTarget", () => {
 			recursive: true,
 			force: true,
 		});
+	});
+
+	test("gzips the renamed binary and writes it alongside as .gz", async () => {
+		const deps = makeDeps();
+		await buildForTarget("bun-linux-x64", deps);
+		expect(deps.readFileSync).toHaveBeenCalledWith("dist/bun-linux-x64");
+		expect(deps.gzipSync).toHaveBeenCalled();
+		expect(deps.writeFileSync).toHaveBeenCalledWith(
+			"dist/bun-linux-x64.gz",
+			expect.anything(),
+		);
+	});
+
+	test("does not gzip when the build fails", async () => {
+		const deps = makeDeps({
+			build: mock(async () => ({
+				success: false,
+				outputs: [],
+				logs: [],
+			})) as unknown as typeof Bun.build,
+		});
+		await buildForTarget("bun-linux-x64", deps);
+		expect(deps.gzipSync).not.toHaveBeenCalled();
 	});
 
 	test("cleans up tmpDir even when build fails", async () => {

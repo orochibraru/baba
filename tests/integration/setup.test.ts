@@ -7,18 +7,57 @@
  *   - Docker daemon running
  *   - dist/bun-linux-x64 built (bun run build)
  *
- * Skipped automatically when the binary is absent.
+ * Skipped automatically when the binary is absent or no container runtime
+ * (Docker/Podman/etc.) is reachable — e.g. in sandboxed dev environments.
  */
 
 import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { GenericContainer } from "testcontainers";
+import { GenericContainer, getContainerRuntimeClient } from "testcontainers";
 
 // Match the host arch so OrbStack / Docker Desktop runs the binary natively.
 // arm64 on Apple Silicon → bun-linux-arm64; x64 everywhere else → bun-linux-x64.
 const LINUX_ARCH = process.arch === "arm64" ? "arm64" : "x64";
 const BINARY_PATH = `dist/bun-linux-${LINUX_ARCH}`;
-const SKIP = !existsSync(BINARY_PATH);
+
+// testcontainers' UnixSocketStrategy hardcodes /var/run/docker.sock. On boxes
+// running OrbStack/Colima/Rancher Desktop instead of Docker Desktop, that path
+// can be a stale leftover symlink (exists, but nothing is listening) while the
+// real socket lives elsewhere — so the strategy "finds" a socket and fails to
+// connect instead of falling through. Point DOCKER_HOST at whatever `docker`
+// itself considers the active context before asking testcontainers to look.
+function useActiveDockerContext(): void {
+	if (process.env.DOCKER_HOST) {
+		return;
+	}
+	try {
+		const proc = Bun.spawnSync([
+			"docker",
+			"context",
+			"inspect",
+			"--format",
+			"{{.Endpoints.docker.Host}}",
+		]);
+		const host = proc.stdout.toString().trim();
+		if (proc.exitCode === 0 && host) {
+			process.env.DOCKER_HOST = host;
+		}
+	} catch {
+		// `docker` CLI not installed — leave testcontainers to its own strategies.
+	}
+}
+
+async function hasContainerRuntime(): Promise<boolean> {
+	useActiveDockerContext();
+	try {
+		await getContainerRuntimeClient();
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+const SKIP = !existsSync(BINARY_PATH) || !(await hasContainerRuntime());
 
 // ── Prompt answer sequence ────────────────────────────────────────────────────
 //

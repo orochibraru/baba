@@ -56,33 +56,33 @@
 			{
 				"assets": [
 					{
-						"path": "dist/bun-linux-x64",
-						"name": "baba-linux-x64",
+						"path": "dist/bun-linux-x64.gz",
+						"name": "baba-linux-x64.gz",
 						"label": "Linux x64"
 					},
 					{
-						"path": "dist/bun-linux-arm64",
-						"name": "baba-linux-arm64",
+						"path": "dist/bun-linux-arm64.gz",
+						"name": "baba-linux-arm64.gz",
 						"label": "Linux ARM64"
 					},
 					{
-						"path": "dist/bun-darwin-x64",
-						"name": "baba-darwin-x64",
+						"path": "dist/bun-darwin-x64.gz",
+						"name": "baba-darwin-x64.gz",
 						"label": "macOS Intel (x64)"
 					},
 					{
-						"path": "dist/bun-darwin-arm64",
-						"name": "baba-darwin-arm64",
+						"path": "dist/bun-darwin-arm64.gz",
+						"name": "baba-darwin-arm64.gz",
 						"label": "macOS Apple Silicon (arm64)"
 					},
 					{
-						"path": "dist/bun-windows-x64.exe",
-						"name": "baba-windows-x64.exe",
+						"path": "dist/bun-windows-x64.exe.gz",
+						"name": "baba-windows-x64.exe.gz",
 						"label": "Windows x64"
 					},
 					{
-						"path": "dist/bun-windows-arm64.exe",
-						"name": "baba-windows-arm64.exe",
+						"path": "dist/bun-windows-arm64.exe.gz",
+						"name": "baba-windows-arm64.exe.gz",
 						"label": "Windows ARM64"
 					},
 					{
