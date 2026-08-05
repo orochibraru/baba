@@ -1,3 +1,20 @@
+## [1.0.15](https://github.com/orochibraru/baba/compare/v1.0.14...v1.0.15) (2026-08-05)
+
+
+### Bug Fixes
+
+* smaller install bundle ([07a6a4a](https://github.com/orochibraru/baba/commit/07a6a4a49ea7a816d4a9057af5e606065219b77a))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.15
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.14](https://github.com/orochibraru/baba/compare/v1.0.13...v1.0.14) (2026-08-05)
 
 
