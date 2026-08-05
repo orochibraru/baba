@@ -164,6 +164,7 @@ See [`docs/config.md`](docs/config.md) for the full reference.
 | `baba validate` | Send a test alert to verify your notifiers |
 | `baba list incidents [-n N]` | List recent incidents (default: 50) |
 | `baba get incident <id>` | Show details and notifications for an incident |
+| `baba version` / `baba -v` | Print the installed version |
 
 ## Running in the background
 

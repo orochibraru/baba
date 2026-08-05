@@ -11,13 +11,22 @@ import { runSetup } from "./lib/cli/setup";
 import { runUninstall } from "./lib/cli/uninstall";
 import { runUpdate } from "./lib/cli/update";
 import { validate } from "./lib/cli/validate";
+import { printVersion } from "./lib/cli/version";
 import { logger } from "./lib/logger";
 import { Process } from "./process";
 
 program
-	.name("Baba")
+	.name("baba")
 	.description("Monitor your homelab server and alert on issues.")
-	.version(packagejson.version);
+	.version(packagejson.version, "-v, --version");
+
+program
+	.command("version")
+	.description("Print the installed version.")
+	.action(() => {
+		logger.debug("CMD called: version");
+		printVersion();
+	});
 
 program
 	.command("start")
@@ -138,7 +147,12 @@ program
 	.command("list incidents")
 	.description("List recorded incidents.")
 	.option("-n, --limit <number>", "Maximum number of incidents to show", "50")
-	.action(async (_: string, opts: { limit: string }) => {
+	.option(
+		"--config <path>",
+		"Path to config.json",
+		process.env.BABA_CONFIG_PATH ?? "/var/lib/baba/config.json",
+	)
+	.action(async (_: string, opts: { limit: string; config: string }) => {
 		logger.debug("CMD called: list incidents");
 		return listIncidents(opts);
 	});
@@ -146,9 +160,15 @@ program
 program
 	.command("get incident <id>")
 	.description("Get details of an incident by ID.")
-	.action(async (_: string, id: string) => {
+	.option(
+		"--config <path>",
+		"Path to config.json",
+		process.env.BABA_CONFIG_PATH ?? "/var/lib/baba/config.json",
+	)
+	// biome-ignore lint/complexity/useMaxParams: commander passes the literal "incident" token as this command's first arg
+	.action(async (_: string, id: string, opts: { config: string }) => {
 		logger.debug("CMD called: get incident");
-		return getIncident(id);
+		return getIncident(id, { exit: process.exit, config: opts.config });
 	});
 
 program.on("error", (err) => {

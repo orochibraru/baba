@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/suspicious/noConsole: This prints the incidents, it's part of the CLI */
+import { loadConfig } from "../../config";
+import { initDb } from "../db";
 import { formatDate } from "../helpers";
 import { IncidentStore } from "../incident-store";
 import { logger } from "../logger";
@@ -6,11 +8,20 @@ import { logger } from "../logger";
 type ListStore = Pick<IncidentStore, "listIncidents">;
 type GetStore = Pick<IncidentStore, "getIncident">;
 
+// Each CLI invocation is a fresh process — unlike `baba start`, nothing else
+// has called initDb() yet, so IncidentStore's shared getDb() would throw.
+async function defaultStore(configPath?: string): Promise<IncidentStore> {
+	await loadConfig(configPath);
+	initDb();
+	return new IncidentStore();
+}
+
 export async function listIncidents(
-	opts: { limit: string },
-	store: ListStore = new IncidentStore(),
+	opts: { limit: string; config?: string },
+	store?: ListStore,
 ) {
-	const incidents = store.listIncidents(Number(opts.limit));
+	const resolvedStore = store ?? (await defaultStore(opts.config));
+	const incidents = resolvedStore.listIncidents(Number(opts.limit));
 
 	if (incidents.length === 0) {
 		logger.info("No incidents recorded.");
@@ -43,15 +54,17 @@ export async function listIncidents(
 }
 
 interface GetIncidentProps {
-	store: GetStore;
+	store?: GetStore;
 	exit: (code: number) => void;
+	config?: string;
 }
 
 export async function getIncident(
 	id: string,
-	props: GetIncidentProps = { store: new IncidentStore(), exit: process.exit },
+	props: GetIncidentProps = { exit: process.exit },
 ) {
-	const incident = props.store.getIncident(Number(id));
+	const store = props.store ?? (await defaultStore(props.config));
+	const incident = store.getIncident(Number(id));
 
 	if (!incident) {
 		logger.error(`Incident #${id} not found.`);

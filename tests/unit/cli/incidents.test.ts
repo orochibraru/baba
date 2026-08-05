@@ -1,5 +1,8 @@
 /** biome-ignore-all lint/suspicious/noConsole: test output */
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { getIncident, listIncidents } from "../../../src/lib/cli/incidents";
 import type {
 	IncidentDetail,
@@ -124,5 +127,59 @@ describe("getIncident", () => {
 		// biome-ignore lint/suspicious/noExplicitAny: test file
 		const store = { getIncident: () => withFailedNotif } as any;
 		await getIncident("1", { store, exit: process.exit });
+	});
+});
+
+// Regression coverage: each CLI invocation is a fresh process, so unlike
+// `baba start`, nothing else has called initDb() yet. Without their own
+// init, these commands throw "Database not initialized — call initDb()
+// first" the moment IncidentStore's constructor calls the shared getDb().
+describe("default deps (production path)", () => {
+	let tmpDir: string | undefined;
+
+	afterEach(() => {
+		if (tmpDir) {
+			rmSync(tmpDir, { recursive: true, force: true });
+			tmpDir = undefined;
+		}
+	});
+
+	function makeConfig(): string {
+		tmpDir = mkdtempSync(join(tmpdir(), "baba-incidents-"));
+		const cfgPath = join(tmpDir, "config.json");
+		writeFileSync(
+			cfgPath,
+			JSON.stringify({
+				database: { path: join(tmpDir, "baba.db") },
+				notifiers: [
+					{
+						type: "discord",
+						webhookUrl: "https://discord.com/api/webhooks/1/token",
+					},
+				],
+			}),
+		);
+		return cfgPath;
+	}
+
+	test("listIncidents initializes its own db when no store is provided", async () => {
+		const config = makeConfig();
+		await expect(
+			listIncidents({ limit: "50", config }),
+		).resolves.toBeUndefined();
+	});
+
+	test("getIncident initializes its own db when no store is provided", async () => {
+		const config = makeConfig();
+		let exitCode: number | undefined;
+		await getIncident("1", {
+			exit: (code) => {
+				exitCode = code;
+			},
+			config,
+		});
+		// Incident #1 doesn't exist in the fresh db, but the important part is
+		// that this got past db initialization instead of throwing.
+		expect(exitCode).toBe(1);
 	});
 });
