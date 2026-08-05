@@ -1,3 +1,22 @@
+## [1.0.13](https://github.com/orochibraru/baba/compare/v1.0.12...v1.0.13) (2026-08-05)
+
+
+### Bug Fixes
+
+* code styling ([ab42993](https://github.com/orochibraru/baba/commit/ab42993ce8e0eaea7ffaaf0e285513cf067ae1d4))
+* config path ([86019b4](https://github.com/orochibraru/baba/commit/86019b4b11dad3b879e53838bf77c43a48353f1c))
+* lint ([7c671ca](https://github.com/orochibraru/baba/commit/7c671cab2a1191e07462849792943574c6c3cc4b))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.13
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.12](https://github.com/orochibraru/baba/compare/v1.0.11...v1.0.12) (2026-07-01)
 
 
