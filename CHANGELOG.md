@@ -1,3 +1,20 @@
+## [1.0.14](https://github.com/orochibraru/baba/compare/v1.0.13...v1.0.14) (2026-08-05)
+
+
+### Bug Fixes
+
+* updater logging ([91e5782](https://github.com/orochibraru/baba/commit/91e57824d4d68690006fd1c629836bae4e256f46))
+
+---
+
+## 🐳 Docker
+
+```sh
+docker pull orochibraru/baba:1.0.14
+```
+
+[View on Docker Hub](https://hub.docker.com/r/orochibraru/baba)
+
 ## [1.0.13](https://github.com/orochibraru/baba/compare/v1.0.12...v1.0.13) (2026-08-05)
 
 
