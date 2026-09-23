@@ -40,7 +40,7 @@ fail when they drift from the `Config` struct and its env vars.
 1. Add its fields to `config.Notifier` and its validation to `Config.validate`
 2. Add its request to `notify.Alert`
 3. Add its `BABA_NOTIFIERS_*` env vars to `applyEnv`
-4. Document it in `docs/config.md`, `docs/env.md` and the schema
+4. Document it in `docs/notifiers.md`, `docs/env.md` and the schema
 
 ## Release process
 

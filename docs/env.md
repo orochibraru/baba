@@ -75,10 +75,19 @@ both are ignored with a warning.
 
 ## Types
 
-| Type      | Parsing                                             |
-| --------- | --------------------------------------------------- |
-| `string`  | Passed through as-is                                |
-| `number`  | Parsed with `Number()`                              |
-| `boolean` | `"true"` or `"1"` → `true`; anything else → `false` |
-| `csv`     | Split on `,`, trimmed, empty strings removed        |
-| `json`    | Parsed with `JSON.parse()` — must be valid JSON     |
+| Type      | Parsing                                                           |
+| --------- | ----------------------------------------------------------------- |
+| `string`  | Passed through as-is                                              |
+| `number`  | A decimal number; the `*_CONSECUTIVE_BREACHES` ones must be whole |
+| `boolean` | `"true"` or `"1"` is `true`; anything else is `false`             |
+| `csv`     | Split on `,`, trimmed, empty entries removed                      |
+
+An unset or empty variable leaves the config value alone. A number that doesn't
+parse stops baba with `invalid value for BABA_…`, instead of silently falling
+back.
+
+## Config file location
+
+`BABA_CONFIG_PATH` sets where every command reads `config.json` when `--config`
+isn't given; the default is `/var/lib/baba/config.json`. The Docker image sets
+it to `/app/config.json`.

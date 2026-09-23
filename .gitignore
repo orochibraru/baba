@@ -3,7 +3,7 @@ coverage/
 tmp/
 
 # local config (contains secrets)
-config.json
+/config.json
 
 .env
 .env.*

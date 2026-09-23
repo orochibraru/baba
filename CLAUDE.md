@@ -2,8 +2,8 @@
 
 Homelab monitor: one static Go binary that checks CPU, load, memory, disk,
 temperature and NVIDIA GPU, and alerts on Discord or Telegram when a threshold
-is breached, reminded, and recovered. Usage in [README.md](README.md), config in
-[docs/config.md](docs/config.md), env vars in [docs/env.md](docs/env.md).
+is breached, reminded, and recovered. Guides in [docs/](docs/README.md), config
+in [docs/config.md](docs/config.md), env vars in [docs/env.md](docs/env.md).
 
 ## Goals and non-goals
 
@@ -35,6 +35,21 @@ is breached, reminded, and recovered. Usage in [README.md](README.md), config in
 - `make cover` fails under 70%: the service package (launchctl, systemctl, sudo)
   is untested glue.
 - When adding a check, prove it can fail by breaking the code once.
+
+## Documentation (required)
+
+Every user-facing change ships with its docs in the same change. The guides are
+`docs/*.md`; the docs site builds from those files in a separate repository
+([@orochibraru/docs](https://github.com/orochibraru/docs)), so there is nowhere
+else to write them.
+
+- `docs/README.md` is the reading-order index for GitHub; `docs/config.json`
+  sets the site's categories, order, titles and Lucide icons (schema:
+  `https://orochibraru.com/docs-config.schema.json`). A new guide goes in both;
+  a unit test fails otherwise.
+- Each table lives in one place; the root README stays short and links to
+  `docs/`. Link between guides relatively (`checks.md#disk`).
+- Check every claim against the code.
 
 ## Conventions
 
