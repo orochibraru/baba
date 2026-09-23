@@ -32,8 +32,8 @@ is breached, reminded, and recovered. Usage in [README.md](README.md), config in
   for macOS and Linux, `go test ./...`, prettier and markdownlint.
 - Integration tests build the binary and run it against the real host with
   thresholds at 0, alerts going to a fake Discord.
-- `mise run cover` fails under 70%: the service package (launchctl, systemctl,
-  sudo) is untested glue.
+- `make cover` fails under 70%: the service package (launchctl, systemctl, sudo)
+  is untested glue.
 - When adding a check, prove it can fail by breaking the code once.
 
 ## Conventions

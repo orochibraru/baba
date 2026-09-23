@@ -16,15 +16,17 @@ Go standard library only: don't add a module.
 ## Running locally
 
 ```bash
-go run ./cmd/baba start --config config.json
-mise run build     # cross-compile release binaries into ./dist
+make run           # go run ./cmd/baba start --config config.json
+make build         # cross-compile release binaries into ./dist (VERSION=x.y.z)
+make docker        # build the image
 ```
 
 ## Tests
 
 ```bash
-go test ./...      # unit tests, then integration tests that build and drive the real binary
-mise run cover     # coverage of cmd/ and internal/ across all tests; fails under 70%
+make test          # unit tests, then integration tests that build and drive the real binary
+make cover         # coverage of cmd/ and internal/ across all tests; fails under 70%
+make lint          # every prek hook on every file
 ```
 
 Integration tests run baba against the host it runs on (thresholds at 0 so every
