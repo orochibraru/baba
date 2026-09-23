@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.0](https://github.com/orochibraru/baba/compare/v1.0.20...v2.0.0) (2026-09-23)
+
+### ⚠ BREAKING CHANGES
+
+* in go (#8) ([fb21e7a](https://github.com/orochibraru/baba/commit/fb21e7a590d733c8af2d55d44a3dcb0c80eb5f20))
+
+### Code Refactoring
+
+* in go (#8) ([fb21e7a](https://github.com/orochibraru/baba/commit/fb21e7a590d733c8af2d55d44a3dcb0c80eb5f20))
+
 ## [1.0.20](https://github.com/orochibraru/baba/compare/v1.0.19...v1.0.20) (2026-09-23)
 
 ## [1.0.19](https://github.com/orochibraru/baba/compare/v1.0.18...v1.0.19) (2026-08-05)
