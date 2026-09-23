@@ -1,6 +1,11 @@
+import { Database } from "bun:sqlite";
 import { describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { Config } from "../../../src/config";
 import {
+	defaultDeps,
 	type HealthDeps,
 	health,
 	runChecks,
@@ -187,5 +192,27 @@ describe("health", () => {
 			console.log = origLog;
 			console.error = origErr;
 		}
+	});
+});
+
+describe("health defaultDeps", () => {
+	test("createDb opens an existing database read-only", () => {
+		const dir = mkdtempSync(join(tmpdir(), "baba-health-"));
+		const path = join(dir, "baba.db");
+		try {
+			const setupDb = new Database(path, { create: true });
+			setupDb.run("CREATE TABLE incidents (id INTEGER)");
+			setupDb.close();
+			const db = defaultDeps.createDb(path);
+			expect(db.query("SELECT COUNT(*) FROM incidents").get()).toBeDefined();
+			db.close();
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+	});
+
+	test("siMem reads host memory", async () => {
+		const mem = await defaultDeps.siMem();
+		expect(mem.total).toBeGreaterThan(0);
 	});
 });

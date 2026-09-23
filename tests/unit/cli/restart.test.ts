@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 import type { RestartDeps } from "../../../src/lib/cli/restart";
-import { runRestart } from "../../../src/lib/cli/restart";
+import { defaultDeps, runRestart } from "../../../src/lib/cli/restart";
 
 function makeDeps(overrides: Partial<RestartDeps> = {}): RestartDeps {
 	return {
@@ -133,5 +133,22 @@ describe("runRestart", () => {
 				"systemctl restart failed",
 			);
 		});
+
+		test("throws when the user service restart fails", async () => {
+			const deps = makeDeps({
+				platform: () => "linux",
+				existsSync: mock((path: string) => path.includes("systemd/user")),
+				exec: mock(async () => ({ ok: false, out: "restart failed" })),
+			});
+			await expect(runRestart(deps)).rejects.toThrow(
+				"systemctl --user restart failed",
+			);
+		});
+	});
+});
+
+describe("restart defaultDeps", () => {
+	test("uid returns the current user id", () => {
+		expect(defaultDeps.uid()).toBe(process.getuid?.() ?? 0);
 	});
 });

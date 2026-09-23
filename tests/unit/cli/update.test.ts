@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { UpdateDeps } from "../../../src/lib/cli/update";
 import {
+	defaultDeps,
 	getLatestVersion,
 	isNewerVersion,
 	resolveMarkerPath,
@@ -282,5 +283,20 @@ describe("resolveMarkerPath", () => {
 		tmpDir = mkdtempSync(join(tmpdir(), "baba-update-missing-"));
 		process.env.DEFAULT_CONFIG_PATH = join(tmpDir, "nonexistent-config.json");
 		expect(await resolveMarkerPath()).toBe("/var/lib/baba/.just_updated");
+	});
+});
+
+describe("update defaultDeps", () => {
+	test("writeFile writes to disk and spawnSync reports the exit code", async () => {
+		const dir = mkdtempSync(join(tmpdir(), "baba-update-defaults-"));
+		const path = join(dir, "bin");
+		try {
+			await defaultDeps.writeFile(path, "binary");
+			expect(await Bun.file(path).text()).toBe("binary");
+			expect(defaultDeps.spawnSync(["true"]).exitCode).toBe(0);
+			expect(defaultDeps.spawnSync(["false"]).exitCode).not.toBe(0);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
 	});
 });

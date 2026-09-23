@@ -1,6 +1,9 @@
 import { describe, expect, mock, test } from "bun:test";
+import { existsSync, mkdirSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { UninstallDeps } from "../../../src/lib/cli/uninstall";
-import { runUninstall } from "../../../src/lib/cli/uninstall";
+import { defaultDeps, runUninstall } from "../../../src/lib/cli/uninstall";
 
 function makeDeps(overrides: Partial<UninstallDeps> = {}): UninstallDeps {
 	return {
@@ -151,5 +154,14 @@ describe("runUninstall", () => {
 				process.stdout.write = orig;
 			}
 		});
+	});
+});
+
+describe("uninstall defaultDeps", () => {
+	test("rm removes a directory recursively", () => {
+		const dir = mkdtempSync(join(tmpdir(), "baba-uninstall-"));
+		mkdirSync(join(dir, "nested"));
+		defaultDeps.rm(dir, { recursive: true, force: true });
+		expect(existsSync(dir)).toBe(false);
 	});
 });

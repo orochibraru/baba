@@ -6,7 +6,7 @@ import pino from "pino";
 // compiled binary's hot path and to prevent any module-init side-effects
 // when running as a server process (non-interactive).
 /* c8 ignore next */
-async function createPinoLogger(): Promise<pino.Logger> {
+export async function createPinoLogger(): Promise<pino.Logger> {
 	/* c8 ignore next */
 	if (!process.stdout.isTTY) {
 		return pino({ level: "info" });

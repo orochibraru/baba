@@ -19,7 +19,7 @@ export type InstallDeps = {
 	mkdirSync: (path: string, opts?: { recursive?: boolean }) => void;
 };
 
-const defaultDeps: InstallDeps = {
+export const defaultDeps: InstallDeps = {
 	platform: osPlatform,
 	configExists: async (path) => Bun.file(path).exists(),
 	writeFile: async (path, content) => {

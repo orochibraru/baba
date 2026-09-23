@@ -431,6 +431,41 @@ describe("setup — check configuration", () => {
 	});
 });
 
+describe("setup — disk and GPU", () => {
+	test("disabled disk monitoring keeps the root volume", async () => {
+		const answers = discordAnswers();
+		// disk: disabled instead of enabled + threshold + volumes
+		answers.splice(16, 3, "n");
+		const { deps, written } = makeTestDeps({ prompts: answers });
+		await setup({ configPath: "/tmp/c.json", deps });
+		const checks = parseWritten(written()).checks as {
+			disk: { enabled: boolean; volumes: string[] };
+		};
+		expect(checks.disk.enabled).toBe(false);
+		expect(checks.disk.volumes).toEqual(["/"]);
+	});
+
+	test("GPU enabled with custom thresholds", async () => {
+		const answers = discordAnswers();
+		// gpu: enabled, 80% VRAM, 4 breaches
+		answers.splice(-1, 1, "y", "80", "4");
+		const { deps, written } = makeTestDeps({ prompts: answers });
+		await setup({ configPath: "/tmp/c.json", deps });
+		const checks = parseWritten(written()).checks as {
+			gpu: {
+				enabled: boolean;
+				vramThresholdPercent: number;
+				consecutiveBreaches: number;
+			};
+		};
+		expect(checks.gpu).toEqual({
+			enabled: true,
+			vramThresholdPercent: 80,
+			consecutiveBreaches: 4,
+		});
+	});
+});
+
 // ── Existing config ───────────────────────────────────────────────────────────
 
 describe("setup — existing config as defaults", () => {
