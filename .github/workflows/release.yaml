@@ -41,14 +41,11 @@ jobs:
           ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
           fetch-depth: 0
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      # The binaries embed package.json's version, which releaser leaves alone
-      # on canaries.
+      # The binaries embed the version through -ldflags, canaries included.
       - name: Tag, release and update the release PR
         uses: orochibraru/releaser@v1
         with:
@@ -56,20 +53,9 @@ jobs:
           rules: breaking=major,feat=patch,docs=patch,refactor=patch,style=patch,test=patch,build=patch,ci=patch,chore=patch
           prerelease: canary
           release-pr: "true"
-          prepare: npm pkg set version=${version} && bun run build
+          prepare: scripts/build.sh ${version}
           artifacts: |
-            dist/bun-linux-x64.gz=baba-linux-x64.gz
-            dist/bun-linux-arm64.gz=baba-linux-arm64.gz
-            dist/bun-darwin-x64.gz=baba-darwin-x64.gz
-            dist/bun-darwin-arm64.gz=baba-darwin-arm64.gz
-            dist/bun-windows-x64.exe.gz=baba-windows-x64.exe.gz
-            dist/bun-windows-arm64.exe.gz=baba-windows-arm64.exe.gz
-            dist/bun-linux-x64=baba-linux-x64
-            dist/bun-linux-arm64=baba-linux-arm64
-            dist/bun-darwin-x64=baba-darwin-x64
-            dist/bun-darwin-arm64=baba-darwin-arm64
-            dist/bun-windows-x64.exe=baba-windows-x64.exe
-            dist/bun-windows-arm64.exe=baba-windows-arm64.exe
+            dist/*
             scripts/install.sh=install.sh
             config.example.json=config.example.json
 

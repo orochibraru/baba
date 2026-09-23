@@ -5,7 +5,7 @@
 	"intervalSeconds": 60,
 	"reminderIntervalMinutes": 30,
 	"database": {
-		"path": "/var/lib/baba/baba.db"
+		"path": "/var/lib/baba/incidents.json"
 	},
 	"checks": {
 		"cpu": {
