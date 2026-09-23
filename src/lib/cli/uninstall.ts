@@ -19,7 +19,7 @@ export type UninstallDeps = {
 	rm: (path: string, opts?: { recursive?: boolean; force?: boolean }) => void;
 };
 
-const defaultDeps: UninstallDeps = {
+export const defaultDeps: UninstallDeps = {
 	platform: osPlatform,
 	existsSync: fsExistsSync,
 	exec: defaultExec,

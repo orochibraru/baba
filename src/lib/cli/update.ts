@@ -61,7 +61,7 @@ export type UpdateDeps = {
 	resolveMarkerPath: typeof resolveMarkerPath;
 };
 
-const defaultDeps: UpdateDeps = {
+export const defaultDeps: UpdateDeps = {
 	getLatestVersion,
 	fetch,
 	gunzipSync: Bun.gunzipSync,

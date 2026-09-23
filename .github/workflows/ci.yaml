@@ -2,6 +2,10 @@ name: CI
 
 on:
   pull_request:
+  # releaser pushes this branch before the release PR exists, so its first
+  # commit only gets a push run.
+  push:
+    branches: [releaser/release]
   workflow_call:
     secrets:
       docker_hub_token:
@@ -67,11 +71,10 @@ jobs:
       - name: Linting
         run: bun run lint
 
-      - name: Test (unit)
-        run: bun test --bail tests/unit --coverage-reporter=lcov
-
-      - name: Test (integration)
-        run: bun test --bail tests/integration --coverage-reporter=lcov
+      # One run: the coverage threshold applies per file, which integration
+      # tests alone can't meet, and a second run would overwrite lcov.info.
+      - name: Test
+        run: bun test --isolate --bail tests --coverage-reporter=lcov
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

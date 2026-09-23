@@ -1,6 +1,9 @@
 import { describe, expect, mock, test } from "bun:test";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { InstallDeps } from "../../../src/lib/cli/install";
-import { runInstall } from "../../../src/lib/cli/install";
+import { defaultDeps, runInstall } from "../../../src/lib/cli/install";
 
 function makeDeps(
 	overrides: Partial<InstallDeps> = {},
@@ -154,5 +157,68 @@ describe("runInstall", () => {
 			});
 			expect(runInstall(deps)).rejects.toThrow("systemctl start failed");
 		});
+
+		test("throws when sudo daemon-reload fails", async () => {
+			const deps = makeDeps({
+				platform: () => "linux",
+				exec: mock(async (cmd: string[]) =>
+					cmd.includes("daemon-reload")
+						? { ok: false, out: "reload failed" }
+						: { ok: true, out: "" },
+				),
+			});
+			await expect(runInstall(deps)).rejects.toThrow("daemon-reload failed");
+		});
+
+		// The user service path is taken when `sudo cp` fails.
+		const failUserStep = (step: string) =>
+			mock(async (cmd: string[]) =>
+				(cmd.includes("sudo") && cmd.includes("cp")) ||
+				(cmd.includes("--user") && cmd.includes(step))
+					? { ok: false, out: `${step} failed` }
+					: { ok: true, out: "" },
+			);
+
+		test("throws when user daemon-reload fails", async () => {
+			const deps = makeDeps({
+				platform: () => "linux",
+				exec: failUserStep("daemon-reload"),
+			});
+			await expect(runInstall(deps)).rejects.toThrow("daemon-reload failed");
+		});
+
+		test("throws when user systemctl enable fails", async () => {
+			const deps = makeDeps({
+				platform: () => "linux",
+				exec: failUserStep("enable"),
+			});
+			await expect(runInstall(deps)).rejects.toThrow("systemctl enable failed");
+		});
+
+		test("throws when user systemctl start fails", async () => {
+			const deps = makeDeps({
+				platform: () => "linux",
+				exec: failUserStep("start"),
+			});
+			await expect(runInstall(deps)).rejects.toThrow("systemctl start failed");
+		});
+	});
+});
+
+describe("install defaultDeps", () => {
+	test("writes files, creates directories and checks for the config", async () => {
+		const dir = mkdtempSync(join(tmpdir(), "baba-install-"));
+		const nested = join(dir, "a", "b");
+		const file = join(nested, "unit.service");
+		try {
+			defaultDeps.mkdirSync(nested, { recursive: true });
+			expect(existsSync(nested)).toBe(true);
+			expect(await defaultDeps.configExists(file)).toBe(false);
+			await defaultDeps.writeFile(file, "content");
+			expect(readFileSync(file, "utf8")).toBe("content");
+			expect(await defaultDeps.configExists(file)).toBe(true);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
 	});
 });

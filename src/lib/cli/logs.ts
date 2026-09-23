@@ -16,7 +16,7 @@ export type LogsDeps = {
 	sleep: (ms: number) => Promise<void>;
 };
 
-const defaultDeps: LogsDeps = {
+export const defaultDeps: LogsDeps = {
 	resolveLogPath: async () => {
 		try {
 			const config = await loadConfig();

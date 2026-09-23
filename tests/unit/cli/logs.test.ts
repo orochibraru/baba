@@ -1,6 +1,9 @@
 import { describe, expect, mock, test } from "bun:test";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { LogsDeps } from "../../../src/lib/cli/logs";
-import { runLogs } from "../../../src/lib/cli/logs";
+import { defaultDeps, runLogs } from "../../../src/lib/cli/logs";
 
 const LOG_PATH = "/var/lib/baba/baba.log";
 
@@ -146,5 +149,42 @@ describe("runLogs", () => {
 			process.stdout.write = orig;
 		}
 		expect(written.join("")).toContain("[INFO] new entry");
+	});
+});
+
+describe("logs defaultDeps", () => {
+	test("resolveLogPath falls back to the default path without a config", async () => {
+		const saved = {
+			path: process.env.DEFAULT_CONFIG_PATH,
+			template: process.env.DEFAULT_CONFIG_TEMPLATE,
+		};
+		process.env.DEFAULT_CONFIG_PATH = "/nonexistent/baba/config.json";
+		process.env.DEFAULT_CONFIG_TEMPLATE = "/nonexistent/baba/default.json";
+		try {
+			expect(await defaultDeps.resolveLogPath()).toBe("/var/lib/baba/baba.log");
+		} finally {
+			process.env.DEFAULT_CONFIG_PATH = saved.path;
+			process.env.DEFAULT_CONFIG_TEMPLATE = saved.template;
+		}
+	});
+
+	test("reads whole files, sizes and byte ranges", async () => {
+		const dir = mkdtempSync(join(tmpdir(), "baba-logs-"));
+		const path = join(dir, "baba.log");
+		try {
+			expect(await defaultDeps.readFile(path)).toBeNull();
+			writeFileSync(path, "hello world");
+			expect(await defaultDeps.readFile(path)).toBe("hello world");
+			expect(await defaultDeps.getFileSize(path)).toBe(11);
+			expect(await defaultDeps.readFrom({ path, offset: 6, length: 5 })).toBe(
+				"world",
+			);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+	});
+
+	test("sleep resolves", async () => {
+		await expect(defaultDeps.sleep(1)).resolves.toBeUndefined();
 	});
 });

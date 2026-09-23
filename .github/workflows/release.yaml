@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - main
-    tags-ignore:
-      - "v*.*.*"
 
 concurrency:
   group: release
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -18,24 +16,29 @@ env:
   TZ: Europe/Paris
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+# Every push to main ships a canary (`vX.Y.Z-canary.N`, a GitHub prerelease).
+# releaser keeps a `chore(release): X.Y.Z` PR open; merging it cuts the stable
+# release. The tags it pushes trigger Publish, which builds the Docker image.
 jobs:
   check:
     uses: ./.github/workflows/ci.yaml
-    if: "!startsWith(github.event.head_commit.message, 'chore(release)')"
     secrets:
       docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
     needs: [check]
-    if: "!startsWith(github.event.head_commit.message, 'chore(release)')"
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
+      # Pushes over a deploy key trigger workflows, unlike github.token: Publish
+      # on the tags, CI on the release PR. It needs write access and a bypass on
+      # any tag and branch rulesets.
       - uses: actions/checkout@v7
         with:
-          token: ${{ secrets.CI_TOKEN }}
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
           fetch-depth: 0
 
       - name: Setup Bun
@@ -44,13 +47,37 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Semantic Release
-        id: semantic # We need this ID to grab the version output in the next steps
-        uses: cycjimmy/semantic-release-action@v6
+      # The binaries embed package.json's version, which releaser leaves alone
+      # on canaries.
+      - name: Tag, release and update the release PR
+        uses: orochibraru/releaser@v1
         with:
-          extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git
-            @semantic-release/exec
+          branch: main
+          rules: breaking=major,feat=patch,docs=patch,refactor=patch,style=patch,test=patch,build=patch,ci=patch,chore=patch
+          prerelease: canary
+          release-pr: "true"
+          prepare: npm pkg set version=${version} && bun run build
+          artifacts: |
+            dist/bun-linux-x64.gz=baba-linux-x64.gz
+            dist/bun-linux-arm64.gz=baba-linux-arm64.gz
+            dist/bun-darwin-x64.gz=baba-darwin-x64.gz
+            dist/bun-darwin-arm64.gz=baba-darwin-arm64.gz
+            dist/bun-windows-x64.exe.gz=baba-windows-x64.exe.gz
+            dist/bun-windows-arm64.exe.gz=baba-windows-arm64.exe.gz
+            dist/bun-linux-x64=baba-linux-x64
+            dist/bun-linux-arm64=baba-linux-arm64
+            dist/bun-darwin-x64=baba-darwin-x64
+            dist/bun-darwin-arm64=baba-darwin-arm64
+            dist/bun-windows-x64.exe=baba-windows-x64.exe
+            dist/bun-windows-arm64.exe=baba-windows-arm64.exe
+            scripts/install.sh=install.sh
+            config.example.json=config.example.json
+
+      # Releases only: the canary tags stay, releaser numbers from them.
+      - name: Keep only the last five canary releases
         env:
-          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 100 --json tagName,isPrerelease \
+            --jq '[.[] | select(.isPrerelease)] | .[5:] | .[].tagName' \
+            | xargs -r -n1 gh release delete --yes

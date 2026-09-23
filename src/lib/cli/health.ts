@@ -20,7 +20,7 @@ export type HealthDeps = {
 	siMem(): Promise<{ total: number }>;
 };
 
-const defaultDeps: HealthDeps = {
+export const defaultDeps: HealthDeps = {
 	loadConfig,
 	existsSync,
 	createDb: (path) => new Database(path, { readonly: true }),

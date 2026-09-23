@@ -15,7 +15,7 @@ export type RestartDeps = {
 	uid: () => number;
 };
 
-const defaultDeps: RestartDeps = {
+export const defaultDeps: RestartDeps = {
 	platform: osPlatform,
 	existsSync: fsExistsSync,
 	exec: defaultExec,
