@@ -72,11 +72,13 @@ func TestSetupStartAndInspect(t *testing.T) {
 		t.Errorf("alert format:\n%s", fake.received())
 	}
 
+	// An idle host can read 0% CPU, which isn't above a 0 threshold: incidents may resolve, so count rows, not OPEN.
+	rows := func(out string) int { return strings.Count(out, "OPEN") + strings.Count(out, "RESOLVED") }
 	out, err = baba(t, env, "", "list", "incidents")
-	if err != nil || strings.Count(out, "OPEN") < 3 || !strings.Contains(out, "memory") {
+	if err != nil || rows(out) < 3 || !strings.Contains(out, "cpu") || !strings.Contains(out, "memory") || !strings.Contains(out, "disk") {
 		t.Errorf("list incidents: %v\n%s", err, out)
 	}
-	if out, _ := baba(t, env, "", "list", "incidents", "-n", "1"); strings.Count(out, "OPEN") != 1 {
+	if out, _ := baba(t, env, "", "list", "incidents", "-n", "1"); rows(out) != 1 {
 		t.Errorf("list incidents -n 1:\n%s", out)
 	}
 	out, err = baba(t, env, "", "get", "incident", "1", "--config", filepath.Join(dir, "config.json"))

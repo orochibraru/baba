@@ -1,0 +1,56 @@
+name: Binary size
+# Builds every release binary and keeps one PR comment with their sizes up to date.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  size:
+    name: Binary size
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - run: make build VERSION=0.0.0-pr.${{ github.event.pull_request.number }}
+      - name: Size table
+        run: |
+          {
+            echo "<!-- binary-size -->"
+            echo "### Binary sizes"
+            echo
+            echo "| Binary | Size | Gzipped |"
+            echo "| --- | ---: | ---: |"
+            for bin in dist/baba-*; do
+              case "$bin" in *.gz) continue ;; esac
+              echo "| \`${bin#dist/}\` | $(numfmt --to=iec-i --suffix=B --format=%.2f "$(stat -c %s "$bin")") | $(numfmt --to=iec-i --suffix=B --format=%.2f "$(stat -c %s "$bin.gz")") |"
+            done
+            echo
+            echo "Built from ${{ github.event.pull_request.head.sha }}."
+          } > size.md
+          cat size.md >> "$GITHUB_STEP_SUMMARY"
+      # Fork PRs get a read-only token: the table stays in the job summary.
+      - name: Comment
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq '.[] | select(.body | startswith("<!-- binary-size -->")) | .id' | head -n1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@size.md >/dev/null
+          else
+            gh pr comment "$PR" --body-file size.md
+          fi
