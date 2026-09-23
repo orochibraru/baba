@@ -2,6 +2,10 @@ name: CI
 
 on:
   pull_request:
+  # releaser pushes this branch before the release PR exists, so its first
+  # commit only gets a push run.
+  push:
+    branches: [releaser/release]
   workflow_call:
     secrets:
       docker_hub_token:

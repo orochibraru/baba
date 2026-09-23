@@ -9,8 +9,12 @@ import { rmSync } from "node:fs";
 import { getDb, initDb } from "../../src/lib/db";
 
 describe("getDb before init", () => {
-	test("throws when called before initDb", () => {
-		expect(() => getDb()).toThrow("Database not initialized");
+	// Other test files share this process and may have called initDb() already;
+	// the query string gets a fresh, uninitialised module instance.
+	test("throws when called before initDb", async () => {
+		const specifier = "../../src/lib/db?uninitialised";
+		const fresh: typeof import("../../src/lib/db") = await import(specifier);
+		expect(() => fresh.getDb()).toThrow("Database not initialized");
 	});
 });
 

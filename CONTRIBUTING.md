@@ -45,6 +45,10 @@ bun run gen           # Run all generators
 
 ## Release process
 
+Every merge to `main` ships a canary (`vX.Y.Z-canary.N`, a GitHub prerelease and the `:canary` image), versioned from Conventional Commits. The stable release waits in the `chore(release): X.Y.Z` PR; merging it cuts `vX.Y.Z`, which `baba update` and the install script pick up.
+
+To contribute:
+
 1. Fork the repository
 2. Create a new branch for your changes
 3. Make your changes and commit them
