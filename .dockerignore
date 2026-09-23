@@ -1,38 +1,4 @@
-# Dependencies (installed fresh in build stage)
-node_modules/
-
-# Runtime config (mounted as a volume)
-config.json
-
-# Git
-.git/
-.gitignore
-.github/
-
-# Dev tooling
-.husky/
-biome.json
-build.ts
-.releaserc.json
-
-# Docs & schema (not needed at compile time)
-docs/
-schema/
-*.md
-
-# Test & coverage artifacts
-tests/
-coverage/
-
-# Local build artifacts & runtime data
-dist/
-tmp/
-
-# Docker files (no need to copy into the build context)
-Dockerfile
-docker-bake.hcl
-compose.yaml
-
-# Misc
-config.example.json
-:memory:
+*
+!go.mod
+!cmd/
+!internal/

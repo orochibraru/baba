@@ -1,0 +1,12 @@
+[tools]
+go = "1.27.1"
+prek = "0.5.3"
+gotestsum = "1.13.0"
+
+[tasks.build]
+description = "Cross-compile the release binaries into dist/"
+run = "scripts/build.sh"
+
+[tasks.cover]
+description = "Coverage of cmd/ and internal/ across all tests; fails under 70%"
+run = ".github/scripts/coverage.sh"

@@ -1,21 +1,15 @@
-FROM oven/bun:1-alpine AS build
-
-WORKDIR /app
-
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --ignore-scripts
-
+FROM golang:1.27.1-alpine AS build
+ARG APP_VERSION=dev
+WORKDIR /src
 COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.version=${APP_VERSION}" -o /baba ./cmd/baba
 
-RUN bun build --compile --outfile /app/baba ./src/index.ts
-
-FROM alpine:latest
-
-RUN apk add --no-cache libstdc++ libgcc dmidecode util-linux procps iproute2 smartmontools
-
+FROM alpine:3.24
+RUN apk add --no-cache ca-certificates
+COPY --from=build /baba /app/baba
 WORKDIR /app
-
-COPY --from=build /app/baba /app/baba
+# Where the compose files mount the config and the data volume.
+ENV BABA_CONFIG_PATH=/app/config.json BABA_DATABASE_PATH=/app/tmp/incidents.json
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
   CMD ["/app/baba", "health"]

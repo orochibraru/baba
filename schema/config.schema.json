@@ -32,12 +32,12 @@
     },
     "database": {
       "default": {
-        "path": "/var/lib/baba/baba.db"
+        "path": "/var/lib/baba/incidents.json"
       },
       "type": "object",
       "properties": {
         "path": {
-          "default": "/var/lib/baba/baba.db",
+          "default": "/var/lib/baba/incidents.json",
           "type": "string",
           "minLength": 1
         }

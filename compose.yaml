@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    # Full host system visibility for systeminformation
+    # Full host system visibility: /proc, /sys and mounts
     privileged: true
     pid: host
     network_mode: host

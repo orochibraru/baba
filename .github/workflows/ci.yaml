@@ -25,73 +25,26 @@ env:
   CI: true
 
 jobs:
-  # ===========================================
-  # TypeScript: Lint, Format, Build — always runs
-  # ===========================================
-  ts-build-check:
-    name: TypeScript Build & Check
+  prek:
+    name: Hooks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
-      - name: Setup bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Setup Node.js for tooling
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          node-version: 24
+          go-version-file: go.mod
+      - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build Webapp
-        run: bun run build
-
-      - name: Type check Webapp
-        run: bun run check
-
-  ts-lint-test:
-    name: TypeScript Lint & Test
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
-      - name: Setup bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Setup Node.js for tooling
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Linting
-        run: bun run lint
-
-      # One run: the coverage threshold applies per file, which integration
-      # tests alone can't meet, and a second run would overwrite lcov.info.
-      - name: Test
-        run: bun test --isolate --bail tests --coverage-reporter=lcov
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/lcov.info
-
-      - name: Ensure schema is up to date
-        run: |
-          echo "Ensuring schema is up to date..."
-          bun run gen:schema
-          git diff --exit-code
-
-      - name: Ensure docs are up to date
-        run: |
-          echo "Ensuring docs are up to date..."
-          bun run gen:docs
-          git diff --exit-code
+          go-version-file: go.mod
+      # Full suite with coverage, including the built binary's runs; fails under 70%.
+      - run: .github/scripts/coverage.sh
 
   # ===========================================
   # Docker: Build — only when Docker files change
@@ -112,12 +65,12 @@ jobs:
   gate:
     name: CI Gate
     if: always()
-    needs: [ts-build-check, ts-lint-test, docker]
+    needs: [prek, test, docker]
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
-          results=("${{ needs.ts-build-check.result }}" "${{ needs.ts-lint-test.result }}" "${{ needs.docker.result }}")
+          results=("${{ needs.prek.result }}" "${{ needs.test.result }}" "${{ needs.docker.result }}")
           for result in "${results[@]}"; do
             if [[ "$result" == "failure" || "$result" == "cancelled" ]]; then
               echo "::error::One or more jobs failed or were cancelled"
