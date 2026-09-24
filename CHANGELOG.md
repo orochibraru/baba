@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1](https://github.com/orochibraru/baba/compare/v2.0.0...v2.0.1) (2026-09-24)
+
+### Bug Fixes
+
+* pinact ([09f0008](https://github.com/orochibraru/baba/commit/09f000873a6651e3e279f7978414676fb46246d2))
+
 ## [2.0.0](https://github.com/orochibraru/baba/compare/v1.0.20...v2.0.0) (2026-09-23)
 
 ### ⚠ BREAKING CHANGES
