@@ -2,6 +2,7 @@
 go = "1.27.1"
 prek = "0.5.3"
 gotestsum = "1.13.0"
+pinact = "5.0.0"
 
 [tasks.build]
 description = "Cross-compile the release binaries into dist/"

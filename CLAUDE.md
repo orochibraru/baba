@@ -29,7 +29,8 @@ in [docs/config.md](docs/config.md), env vars in [docs/env.md](docs/env.md).
 ## Testing
 
 - `mise install`, `prek install`; hooks run gofmt, `go mod tidy -diff`, go vet
-  for macOS and Linux, `go test ./...`, prettier and markdownlint.
+  for macOS and Linux, `go test ./...`, prettier, markdownlint and pinact
+  (Actions pinned to SHAs).
 - Integration tests build the binary and run it against the real host with
   thresholds at 0, alerts going to a fake Discord.
 - `make cover` fails under 70%: the service package (launchctl, systemctl, sudo)

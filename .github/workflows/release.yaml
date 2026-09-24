@@ -36,7 +36,7 @@ jobs:
       # Pushes over a deploy key trigger workflows, unlike github.token: Publish
       # on the tags, CI on the release PR. It needs write access and a bypass on
       # any tag and branch rulesets.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
           fetch-depth: 0
@@ -47,7 +47,7 @@ jobs:
 
       # The binaries embed the version through -ldflags, canaries included.
       - name: Tag, release and update the release PR
-        uses: orochibraru/releaser@v1
+        uses: orochibraru/releaser@8eee44bb688e8600535d5ca454223a1a9f468491 # v1.7.0
         with:
           branch: main
           rules: breaking=major,feat=patch,docs=patch,refactor=patch,style=patch,test=patch,build=patch,ci=patch,chore=patch

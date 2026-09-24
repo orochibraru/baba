@@ -2,11 +2,11 @@
 
 ## Prerequisites
 
-[mise](https://mise.jdx.dev) installs the pinned Go, prek and gotestsum:
+[mise](https://mise.jdx.dev) installs the pinned Go, prek, gotestsum and pinact:
 
 ```bash
 mise install
-prek install   # hooks on every commit: gofmt, go mod tidy, go vet (macOS and Linux), go test, Markdown
+prek install   # hooks on every commit: gofmt, go mod tidy, go vet (macOS and Linux), go test, Markdown, pinned Actions
 cp config.example.json config.json
 # Edit config.json: set at least one notifier
 ```

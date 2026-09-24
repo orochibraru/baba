@@ -52,3 +52,8 @@ repos:
         language: system
         types: [go]
         pass_filenames: false
+      - id: pinact
+        name: Pin GitHub Actions to SHAs (pinact)
+        entry: pinact run
+        language: system
+        files: ^\.github/workflows/.*\.ya?ml$
