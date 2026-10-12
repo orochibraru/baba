@@ -1,6 +1,6 @@
 [tools]
 go = "1.27.2"
-prek = "0.5.3"
+prek = "0.5.5"
 gotestsum = "1.13.0"
 pinact = "5.0.0"
 
