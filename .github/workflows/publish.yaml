@@ -11,7 +11,7 @@ concurrency:
 
 env:
   TZ: Europe/Paris
-  REGISTRY_IMAGE: orochibraru/baba
+  REGISTRY_IMAGE: zedensix/baba
 
 permissions:
   contents: read
@@ -22,7 +22,7 @@ jobs:
     uses: ./.github/workflows/docker.yaml
     with:
       publish: true
-      image-name: orochibraru/baba
+      image-name: zedensix/baba
     secrets:
       docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}
 
@@ -47,7 +47,7 @@ jobs:
       - name: Login to Container registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
-          username: orochibraru
+          username: zedensix
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Set up Docker Buildx

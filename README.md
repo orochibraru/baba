@@ -2,10 +2,10 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Latest Release](https://img.shields.io/github/v/release/orochibraru/baba)
-![Docker Pulls](https://img.shields.io/docker/pulls/orochibraru/baba)
+![Docker Pulls](https://img.shields.io/docker/pulls/zedensix/baba)
 
-[Docs](docs/README.md) · [Docker Hub](https://hub.docker.com/r/orochibraru/baba)
-· [Releases](https://github.com/orochibraru/baba/releases)
+[Docs](docs/README.md) · [Docker Hub](https://hub.docker.com/r/zedensix/baba) ·
+[Releases](https://github.com/orochibraru/baba/releases)
 
 > Named after the lookout pirate in the French comic book _Astérix_, always
 > watching for trouble on the horizon.

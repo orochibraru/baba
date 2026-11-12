@@ -1,6 +1,6 @@
 services:
   baba:
-    image: orochibraru/baba:latest
+    image: zedensix/baba:latest
     restart: unless-stopped
     # Full host system visibility: /proc, /sys and mounts
     privileged: true

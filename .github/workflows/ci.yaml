@@ -20,7 +20,7 @@ concurrency:
 
 env:
   TZ: Europe/Paris
-  REGISTRY_IMAGE: orochibraru/baba
+  REGISTRY_IMAGE: zedensix/baba
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   CI: true
 
@@ -59,7 +59,7 @@ jobs:
     uses: ./.github/workflows/docker.yaml
     with:
       publish: true
-      image-name: orochibraru/baba
+      image-name: zedensix/baba
     secrets:
       docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}
 

@@ -1,6 +1,6 @@
 # Docker
 
-The `orochibraru/baba` image (linux/amd64 and linux/arm64) runs `baba start` and
+The `zedensix/baba` image (linux/amd64 and linux/arm64) runs `baba start` and
 checks its own health with `baba health`. It needs to see the host, not the
 container, so it runs privileged in the host's PID and network namespaces.
 
@@ -34,7 +34,7 @@ docker run -d \
   -v /dev:/dev:ro \
   -v /path/to/config.json:/app/config.json:ro \
   -v /path/to/data:/app/tmp \
-  orochibraru/baba:latest
+  zedensix/baba:latest
 ```
 
 With environment variables only: without a config file, baba starts from the
@@ -49,7 +49,7 @@ docker run -d \
   -v /dev:/dev:ro \
   -v /path/to/data:/app/tmp \
   -e BABA_NOTIFIERS_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/<id>/<token> \
-  orochibraru/baba:latest
+  zedensix/baba:latest
 ```
 
 Every variable is in [Environment variables](env.md).
