@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/incidents"
+	"github.com/zedensix/baba/internal/incidents"
 )
 
 func TestStorePersists(t *testing.T) {

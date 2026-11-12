@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/orochibraru/baba/refs/heads/main/schema/config.schema.json",
+	"$schema": "https://raw.githubusercontent.com/zedensix/baba/refs/heads/main/schema/config.schema.json",
 	"machineName": "my-server",
 	"logLevel": "info",
 	"intervalSeconds": 60,
@@ -26,7 +26,9 @@
 		"disk": {
 			"enabled": true,
 			"usageThresholdPercent": 90,
-			"volumes": ["/"]
+			"volumes": [
+				"/"
+			]
 		},
 		"temperature": {
 			"enabled": false,

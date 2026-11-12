@@ -1,11 +1,11 @@
 # Baba
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Latest Release](https://img.shields.io/github/v/release/orochibraru/baba)
+![Latest Release](https://img.shields.io/github/v/release/zedensix/baba)
 ![Docker Pulls](https://img.shields.io/docker/pulls/zedensix/baba)
 
 [Docs](docs/README.md) · [Docker Hub](https://hub.docker.com/r/zedensix/baba) ·
-[Releases](https://github.com/orochibraru/baba/releases)
+[Releases](https://github.com/zedensix/baba/releases)
 
 > Named after the lookout pirate in the French comic book _Astérix_, always
 > watching for trouble on the horizon.
@@ -37,7 +37,7 @@ something goes wrong — and tells you when it's fixed.
 ### Install script (Linux / macOS)
 
 ```bash
-curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/zedensix/baba/releases/latest/download/install.sh | sh
 baba setup      # wizard: notifiers and thresholds
 baba validate   # send a test alert
 baba install    # background service (launchd on macOS, systemd on Linux)
@@ -48,8 +48,8 @@ Details in [Getting started](docs/getting-started.md).
 ### Docker Compose
 
 ```bash
-curl -o config.json https://raw.githubusercontent.com/orochibraru/baba/main/config.example.json
-curl -o compose.yaml https://raw.githubusercontent.com/orochibraru/baba/main/compose.example.yaml
+curl -o config.json https://raw.githubusercontent.com/zedensix/baba/main/config.example.json
+curl -o compose.yaml https://raw.githubusercontent.com/zedensix/baba/main/compose.example.yaml
 # edit config.json: at least one notifier
 docker compose up -d
 ```

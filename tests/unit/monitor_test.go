@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/orochibraru/baba/internal/incidents"
-	"github.com/orochibraru/baba/internal/monitor"
+	"github.com/zedensix/baba/internal/incidents"
+	"github.com/zedensix/baba/internal/monitor"
 )
 
 type recorder struct {

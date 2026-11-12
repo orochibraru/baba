@@ -6,7 +6,7 @@ leave it running.
 ## 1. Install
 
 ```bash
-curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/zedensix/baba/releases/latest/download/install.sh | sh
 ```
 
 The script detects your OS (Linux or macOS) and architecture (x64 or arm64),
@@ -21,14 +21,14 @@ from the default template unless one already exists.
 | `CONFIG_PATH` | `/var/lib/baba/config.json` | Where the config is seeded                 |
 
 ```bash
-curl -fsSL https://github.com/orochibraru/baba/releases/latest/download/install.sh | INSTALL_DIR=~/.local/bin sh
+curl -fsSL https://github.com/zedensix/baba/releases/latest/download/install.sh | INSTALL_DIR=~/.local/bin sh
 ```
 
 The [background service](service.md) always runs `/usr/local/bin/baba`, so keep
 the default `INSTALL_DIR` if you plan to use `baba install`.
 
 Prefer to download by hand? Every
-[release](https://github.com/orochibraru/baba/releases) has
+[release](https://github.com/zedensix/baba/releases) has
 `baba-<linux|darwin>-<x64|arm64>`, and a `.gz` of each.
 
 ## 2. Configure

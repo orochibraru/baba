@@ -49,7 +49,7 @@ fields and how to get a webhook URL or a bot token are in
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/orochibraru/baba/refs/heads/main/schema/config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/zedensix/baba/refs/heads/main/schema/config.schema.json",
   "notifiers": [
     {
       "type": "discord",
@@ -81,5 +81,5 @@ baba: invalid config:
 ## Full example with all fields
 
 See
-[`config.example.json`](https://github.com/orochibraru/baba/blob/main/config.example.json),
+[`config.example.json`](https://github.com/zedensix/baba/blob/main/config.example.json),
 which the install script uses as the default template.

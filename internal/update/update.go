@@ -19,8 +19,8 @@ import (
 
 // Repo is the GitHub API and download base; tests point it at a fake server.
 var Repo = struct{ API, Download string }{
-	API:      "https://api.github.com/repos/orochibraru/baba/releases/latest",
-	Download: "https://github.com/orochibraru/baba/releases/download",
+	API:      "https://api.github.com/repos/zedensix/baba/releases/latest",
+	Download: "https://github.com/zedensix/baba/releases/download",
 }
 
 var client = &http.Client{Timeout: 2 * time.Minute}

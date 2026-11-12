@@ -1,3 +1,3 @@
-module github.com/orochibraru/baba
+module github.com/zedensix/baba
 
 go 1.27.1

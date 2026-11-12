@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/orochibraru/baba/internal/incidents"
+	"github.com/zedensix/baba/internal/incidents"
 )
 
 type Monitor struct {

@@ -58,7 +58,8 @@ jobs:
     name: Docker
     uses: ./.github/workflows/docker.yaml
     with:
-      publish: true
+      # A fork PR gets no registry secret: build only.
+      publish: ${{ !github.event.pull_request.head.repo.fork }}
       image-name: zedensix/baba
     secrets:
       docker_hub_token: ${{ secrets.DOCKER_HUB_TOKEN }}

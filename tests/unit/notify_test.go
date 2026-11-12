@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/config"
-	"github.com/orochibraru/baba/internal/notify"
+	"github.com/zedensix/baba/internal/config"
+	"github.com/zedensix/baba/internal/notify"
 )
 
 func TestAlert(t *testing.T) {

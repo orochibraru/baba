@@ -16,10 +16,10 @@ rewrites the definition and restarts it. After editing `config.json`,
 
 ## macOS: launchd
 
-A LaunchAgent at `~/Library/LaunchAgents/com.orochibraru.baba.plist`, loaded
-with `launchctl load -w`. It runs as your user, starts at login (`RunAtLoad`)
-and is restarted whenever it exits (`KeepAlive`). `baba restart` runs
-`launchctl kickstart -k gui/<uid>/com.orochibraru.baba`.
+A LaunchAgent at `~/Library/LaunchAgents/com.zedensix.baba.plist`, loaded with
+`launchctl load -w`. It runs as your user, starts at login (`RunAtLoad`) and is
+restarted whenever it exits (`KeepAlive`). `baba restart` runs
+`launchctl kickstart -k gui/<uid>/com.zedensix.baba`.
 
 ## Linux: systemd
 

@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/update"
+	"github.com/zedensix/baba/internal/update"
 )
 
 func TestIsNewer(t *testing.T) {

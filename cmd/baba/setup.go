@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/orochibraru/baba/internal/config"
+	"github.com/zedensix/baba/internal/config"
 )
 
 // setup asks for every setting, the current value (or default) as the answer to an empty line.

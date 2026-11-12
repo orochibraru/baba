@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/config"
+	"github.com/zedensix/baba/internal/config"
 )
 
 // schema/config.schema.json is written by hand: every key it declares must exist in Config, and the reverse.

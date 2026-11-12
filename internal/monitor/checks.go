@@ -7,8 +7,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/orochibraru/baba/internal/config"
-	"github.com/orochibraru/baba/internal/sysinfo"
+	"github.com/zedensix/baba/internal/config"
+	"github.com/zedensix/baba/internal/sysinfo"
 )
 
 // Run reads every enabled check once and returns the status line; a failing check is logged and skipped.

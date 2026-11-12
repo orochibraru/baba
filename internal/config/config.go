@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-const SchemaURL = "https://raw.githubusercontent.com/orochibraru/baba/refs/heads/main/schema/config.schema.json"
+const SchemaURL = "https://raw.githubusercontent.com/zedensix/baba/refs/heads/main/schema/config.schema.json"
 
 type Config struct {
 	Schema                  string     `json:"$schema,omitempty"`

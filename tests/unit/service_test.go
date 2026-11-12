@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/service"
+	"github.com/zedensix/baba/internal/service"
 )
 
 func TestUnit(t *testing.T) {
@@ -19,7 +19,7 @@ func TestUnit(t *testing.T) {
 
 func TestPlist(t *testing.T) {
 	plist := service.Plist()
-	if !strings.Contains(plist, "<string>com.orochibraru.baba</string>") || !strings.Contains(plist, "<string>/var/lib/baba/baba.log</string>") {
+	if !strings.Contains(plist, "<string>com.zedensix.baba</string>") || !strings.Contains(plist, "<string>/var/lib/baba/baba.log</string>") {
 		t.Error(plist)
 	}
 	if lint, err := exec.LookPath("plutil"); err == nil {

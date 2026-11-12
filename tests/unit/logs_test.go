@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/logs"
+	"github.com/zedensix/baba/internal/logs"
 )
 
 func TestFormat(t *testing.T) {

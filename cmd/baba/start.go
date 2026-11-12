@@ -10,12 +10,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/orochibraru/baba/internal/config"
-	"github.com/orochibraru/baba/internal/incidents"
-	"github.com/orochibraru/baba/internal/monitor"
-	"github.com/orochibraru/baba/internal/notify"
-	"github.com/orochibraru/baba/internal/sysinfo"
-	"github.com/orochibraru/baba/internal/update"
+	"github.com/zedensix/baba/internal/config"
+	"github.com/zedensix/baba/internal/incidents"
+	"github.com/zedensix/baba/internal/monitor"
+	"github.com/zedensix/baba/internal/notify"
+	"github.com/zedensix/baba/internal/sysinfo"
+	"github.com/zedensix/baba/internal/update"
 )
 
 func start(configPath string) error {

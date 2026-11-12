@@ -15,7 +15,7 @@ const (
 	LibDir     = "/var/lib/baba"
 	ConfigPath = LibDir + "/config.json"
 	LogPath    = LibDir + "/baba.log"
-	Label      = "com.orochibraru.baba"
+	Label      = "com.zedensix.baba"
 	systemUnit = "/etc/systemd/system/baba.service"
 )
 

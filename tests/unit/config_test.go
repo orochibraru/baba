@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/config"
+	"github.com/zedensix/baba/internal/config"
 )
 
 func writeConfig(t *testing.T, body string) string {

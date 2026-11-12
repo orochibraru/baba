@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/sysinfo"
+	"github.com/zedensix/baba/internal/sysinfo"
 )
 
 func TestProcStatCPU(t *testing.T) {

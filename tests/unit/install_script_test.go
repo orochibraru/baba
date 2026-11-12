@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/orochibraru/baba/internal/update"
+	"github.com/zedensix/baba/internal/update"
 )
 
 // install.sh and 'baba update' must agree on asset names, and so must every release since the Bun builds.
 func TestInstallScriptAsset(t *testing.T) {
 	for version, url := range map[string]string{
-		"latest": "https://github.com/orochibraru/baba/releases/latest/download/" + update.Asset() + ".gz",
-		"1.2.3":  "https://github.com/orochibraru/baba/releases/download/v1.2.3/" + update.Asset() + ".gz",
+		"latest": "https://github.com/zedensix/baba/releases/latest/download/" + update.Asset() + ".gz",
+		"1.2.3":  "https://github.com/zedensix/baba/releases/download/v1.2.3/" + update.Asset() + ".gz",
 	} {
 		cmd := exec.Command("sh", "../../scripts/install.sh")
 		cmd.Env = append(os.Environ(), "DRY_RUN=1", "VERSION="+version, "INSTALL_DIR=/opt/bin")

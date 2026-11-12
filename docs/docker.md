@@ -7,8 +7,8 @@ container, so it runs privileged in the host's PID and network namespaces.
 ## Docker Compose
 
 ```bash
-curl -o config.json https://raw.githubusercontent.com/orochibraru/baba/main/config.example.json
-curl -o compose.yaml https://raw.githubusercontent.com/orochibraru/baba/main/compose.example.yaml
+curl -o config.json https://raw.githubusercontent.com/zedensix/baba/main/config.example.json
+curl -o compose.yaml https://raw.githubusercontent.com/zedensix/baba/main/compose.example.yaml
 # edit config.json: at least one notifier
 docker compose up -d
 ```

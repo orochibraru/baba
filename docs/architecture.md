@@ -61,4 +61,4 @@ Integration tests build the binary and drive it like a user: the setup wizard
 with piped answers, `validate`, then `start` against the real host with every
 threshold at 0, alerts landing in a fake Discord webhook, and the incident
 commands afterwards. More in
-[CONTRIBUTING.md](https://github.com/orochibraru/baba/blob/main/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/zedensix/baba/blob/main/CONTRIBUTING.md).

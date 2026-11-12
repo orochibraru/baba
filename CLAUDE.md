@@ -41,13 +41,13 @@ in [docs/config.md](docs/config.md), env vars in [docs/env.md](docs/env.md).
 
 Every user-facing change ships with its docs in the same change. The guides are
 `docs/*.md`; the docs site builds from those files in a separate repository
-([@orochibraru/docs](https://github.com/orochibraru/docs)), so there is nowhere
-else to write them.
+([@zedensix/docs](https://github.com/zedensix/docs)), so there is nowhere else
+to write them.
 
 - `docs/README.md` is the reading-order index for GitHub; `docs/config.json`
   sets the site's categories, order, titles and Lucide icons (schema:
-  `https://orochibraru.com/docs-config.schema.json`). A new guide goes in both;
-  a unit test fails otherwise.
+  `https://zedensix.com/docs-config.schema.json`). A new guide goes in both; a
+  unit test fails otherwise.
 - Each table lives in one place; the root README stays short and links to
   `docs/`. Link between guides relatively (`checks.md#disk`).
 - Check every claim against the code.

@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-REPO="orochibraru/baba"
+REPO="zedensix/baba"
 BIN_NAME="baba"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 VERSION="${VERSION:-latest}"

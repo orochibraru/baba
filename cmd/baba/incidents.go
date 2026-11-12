@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/orochibraru/baba/internal/incidents"
+	"github.com/zedensix/baba/internal/incidents"
 )
 
 func openStore(configPath string) (*incidents.Store, error) {

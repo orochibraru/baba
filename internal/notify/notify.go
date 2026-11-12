@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/orochibraru/baba/internal/config"
+	"github.com/zedensix/baba/internal/config"
 )
 
 // TelegramAPI is the Bot API base URL; tests point it at a fake server.

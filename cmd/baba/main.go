@@ -10,10 +10,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/orochibraru/baba/internal/config"
-	"github.com/orochibraru/baba/internal/logs"
-	"github.com/orochibraru/baba/internal/notify"
-	"github.com/orochibraru/baba/internal/service"
+	"github.com/zedensix/baba/internal/config"
+	"github.com/zedensix/baba/internal/logs"
+	"github.com/zedensix/baba/internal/notify"
+	"github.com/zedensix/baba/internal/service"
 )
 
 // version is set at build time with -ldflags "-X main.version=1.2.3".
