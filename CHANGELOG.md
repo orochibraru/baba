@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.4](https://github.com/zedensix/baba/compare/v2.0.3...v2.0.4) (2026-11-12)
+
+### Bug Fixes
+
+* docs & refs (oro to zn6) ([d02e20d](https://github.com/zedensix/baba/commit/d02e20dc3f85d1d2c156a4a72f87f67f793a1eae))
+
 ## [2.0.3](https://github.com/orochibraru/baba/compare/v2.0.2...v2.0.3) (2026-11-08)
 
 ## [2.0.2](https://github.com/orochibraru/baba/compare/v2.0.1...v2.0.2) (2026-11-06)
