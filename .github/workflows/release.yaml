@@ -47,7 +47,7 @@ jobs:
 
       # The binaries embed the version through -ldflags, canaries included.
       - name: Tag, release and update the release PR
-        uses: orochibraru/releaser@8eee44bb688e8600535d5ca454223a1a9f468491 # v1.7.0
+        uses: zedensix/releaser@ba23a5840fb7ec8db1aa81bff4d4478f6e499020 # v1.7.3
         with:
           branch: main
           rules: breaking=major,feat=patch,docs=patch,refactor=patch,style=patch,test=patch,build=patch,ci=patch,chore=patch
