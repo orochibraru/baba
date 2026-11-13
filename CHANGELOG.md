@@ -1,5 +1,7 @@
 # Changelog
 
+## [2.0.5](https://github.com/zedensix/baba/compare/v2.0.4...v2.0.5) (2026-11-13)
+
 ## [2.0.4](https://github.com/zedensix/baba/compare/v2.0.3...v2.0.4) (2026-11-12)
 
 ### Bug Fixes
